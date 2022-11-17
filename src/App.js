@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Route,Routes} from 'react-router-dom';
 //Pages
 import Home from './pages/home';
 import Register from './pages/register';
+import Login from './pages/login';
 import Error from './pages/error';
 
 // Asset Imports
@@ -28,6 +29,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home/>} ></Route>
         <Route path='/register' element={<Register/>} ></Route>
+        <Route path='/login' element={<Login/>} ></Route>
         <Route path='*' element={<Error/>} ></Route>
       </Routes>
     </Router>
