@@ -1,11 +1,13 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route,Routes} from 'react-router-dom';
+
+//Pages
+import Home from './pages/home';
 import Register from './pages/register';
 import Error from './pages/error';
 
 // Asset Imports
-
 // Stylesheets
 import './assets/vendor/unicons-2.0.1/css/unicons.css';
 import './assets/css/style.css';
@@ -24,6 +26,7 @@ function App() {
   return (<>
     <Router>
       <Routes>
+        <Route path='/' element={<Home/>} ></Route>
         <Route path='/register' element={<Register/>} ></Route>
         <Route path='*' element={<Error/>} ></Route>
       </Routes>
