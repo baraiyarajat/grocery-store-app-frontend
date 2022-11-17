@@ -1,5 +1,6 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
+import {Link} from 'react-router-dom';
 import logo from '../../assets/images/logo.svg';
 import darkLogo from '../../assets/images/dark-logo.svg';
 
@@ -62,7 +63,7 @@ function Register(){
                                         </form>
                                     </div>
                                     <div className="signup-link">
-                                        <p>I have an account? - <a href="sign_in.html">Sign In Now</a></p>
+                                        <p>I have an account? - <Link to="/login" >Sign in</Link></p>
                                     </div>
                                 </div>
                             </div>
