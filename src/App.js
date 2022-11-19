@@ -27,6 +27,8 @@ import Dashboard from './pages/dashboard';
 import Wishlist from './pages/wishlist';
 import Orders from './pages/orders';
 import Wallet from './pages/wallet';
+import Address from './pages/address';
+import Rewards from './pages/rewards';
 
 
 
@@ -42,6 +44,8 @@ function App() {
         <Route path='/wishlist' element={<Wishlist/>} ></Route>
         <Route path='/orders' element={<Orders/>} ></Route>
         <Route path='/wallet' element={<Wallet/>} ></Route>
+        <Route path='/address' element={<Address/>} ></Route>
+        <Route path='/rewards' element={<Rewards/>} ></Route>
         <Route path='*' element={<Error/>} ></Route>
       </Routes>
     </Router>
