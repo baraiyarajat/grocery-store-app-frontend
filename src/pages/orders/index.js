@@ -61,7 +61,7 @@ function Orders(){
                                             <Link to="/rewards" className="user-item"><i className="uil uil-gift"></i>My Rewards</Link>
                                             <Link to="/wallet" className="user-item "><i className="uil uil-wallet"></i>My Wallet</Link>
                                             <Link to="/wishlist" className="user-item "><i className="uil uil-heart"></i>Shopping Wishlist</Link>
-                                            <Link to="/addresses" className="user-item"><i className="uil uil-location-point"></i>My Address</Link>
+                                            <Link to="/address" className="user-item"><i className="uil uil-location-point"></i>My Address</Link>
                                             <Link to="/logout" className="user-item"><i className="uil uil-exit"></i>Logout</Link>
                                         </div>
                                     </div>
