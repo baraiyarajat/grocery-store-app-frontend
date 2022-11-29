@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+
+import { Link } from 'react-router-dom';
 
 //Includes
 import Navbar from '../includes/Navbar';
@@ -32,12 +34,17 @@ import img1 from '../../assets/images/product/img-1.jpg'
 import OwlCarousel from "react-owl-carousel";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUser } from '../../store/user/userSlice';
+import warehouseSlice, { getWarehouses } from '../../store/warehouse/warehouseSlice';
+
 
 
 
 
 
 function Home(){
+
 
     return(
         <>
@@ -152,12 +159,12 @@ function Home(){
                             <div className="col-md-12">
                                 <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
                                     <div className="item">
-                                        <a href="#" className="category-item">
+                                        <Link to="/products-by-category/vegetables-and-fruits" className="category-item">
                                             <div className="cate-img">
                                                 <img src={icon1} alt=""/>
                                             </div>
                                             <h4>Vegetables & Fruits</h4>
-                                        </a>
+                                        </Link>
                                     </div>
                                     <div className="item">
                                         <a href="#" className="category-item">

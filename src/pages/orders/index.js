@@ -22,7 +22,7 @@ function Orders(){
                                 <div className="col-md-12">
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
-                                            <li className="breadcrumb-item"><a href="index.html">Home</a></li>
+                                            <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                                             <li className="breadcrumb-item active" aria-current="page">My Orders</li>
                                         </ol>
                                     </nav>

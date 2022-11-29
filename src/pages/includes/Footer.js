@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-
+import axios from 'axios';
 import {Link} from 'react-router-dom';
-
+import { setSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
+import { useSelector } from "react-redux";
+import { getWarehouses } from "../../store/warehouse/warehouseSlice";
 
 //images
 import pyicon1 from '../../assets/images/footer-icons/pyicon-1.svg'
@@ -12,9 +14,17 @@ import pyicon4 from '../../assets/images/footer-icons/pyicon-4.svg'
 import pyicon6 from '../../assets/images/footer-icons/pyicon-6.svg'
 import download1 from '../../assets/images/download-1.svg'   
 import download2 from '../../assets/images/download-2.svg'   
+import { useDispatch } from "react-redux";
 
 
 function Footer(){
+    const dispatch = useDispatch()
+
+    const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
+     useEffect(()=>{
+        dispatch(getWarehouses())
+    },[])
+
 
     return (
         <>            
@@ -82,10 +92,9 @@ function Footer(){
                                 <div className="second-row-item">
                                     <h4>Top Cities</h4>
                                     <ul>
-                                        <li><Link href="#">Gurugram</Link></li>
-                                        <li><Link href="#">New Delhi</Link></li>
-                                        <li><Link href="#">Bangaluru</Link></li>
-                                        <li><Link href="#">Mumbai</Link></li>
+                                        {warehouses.map((warehouse)=>{
+                                            return <li key={warehouse.id} ><Link onClick={()=>dispatch(setSelectedWarehouse(warehouse.id))}>{warehouse.name}</Link></li>
+                                        })}
                                     </ul>
                                 </div>
                             </div>

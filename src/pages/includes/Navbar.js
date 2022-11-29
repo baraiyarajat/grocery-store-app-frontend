@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 import {Link} from 'react-router-dom';
-
+import axios from "axios";
 
 //Components
 import CartSidebar from "./components/CartSidebar";
@@ -18,6 +18,9 @@ import img5 from '../../assets/images/avatar/img-5.jpg'
 import Dropdown from 'react-bootstrap/Dropdown';
 
 
+import { fetchUser } from "../../store/user/userSlice";
+import { getWarehouses } from "../../store/warehouse/warehouseSlice";
+import { getSelectedWarehouse, setSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
 
 //Category Icons
 // import icon1 from '../../assets/images/category/icon-1.svg'
@@ -31,12 +34,120 @@ import Dropdown from 'react-bootstrap/Dropdown';
 // import icon9 from '../../assets/images/category/icon-9.svg'
 
 
+import {useDispatch, useSelector} from 'react-redux'
+import Button from "react-bootstrap/esm/Button";
+import { getWishlist } from "../../store/wishlist/wishlistSlice";
+
+
+function GuestUserItems(){
+    return(
+        <>
+            <li>
+                <Link to="/login" className="offer-link"><i className="uil uil-user"></i>Log-in</Link>
+                <Link to="/register" className="offer-link"><i className="uil uil-user-plus"></i>Register</Link>
+            </li>
+        </>
+    )
+
+}
+
+
+function Logout(){
+    return (<>
+        <Dropdown.Item ><i className="uil uil-lock-alt icon__1" ></i>Logout</Dropdown.Item>
+    </>)
+}
+
+
+function UserAuthenticatedItems({user}){
+
+    const { wishlistProducts, isWishlistLoading } = useSelector((store)=>store.wishlist) 
+    const {warehouse} = useSelector((store)=>store.selectedWarehouse)
+
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+       dispatch(getWishlist())
+    },[warehouse])
+
+    // console.log(wishlistProducts)
+
+    return(
+        <>
+            <li>
+                {!isWishlistLoading && <Link to="/wishlist" className="option_links" title="Wishlist"><i className='uil uil-heart icon_wishlist'></i><span className="noti_count1">{wishlistProducts.length}</span></Link>}
+            </li>	
+            
+
+            <li className="ui dropdown"> 
+                <Dropdown className="opts_account" >
+                    <Dropdown.Toggle  >
+                        <img src={img5} alt=""/>
+                        <span className="user__name">{user.first_name} {user.last_name}</span>
+                    </Dropdown.Toggle>
+                    
+                    <Dropdown.Menu  >
+                        <Dropdown.Item href="/dashboard" className="item channel_item"><i className="uil uil-apps icon__1"></i>Dashbaord</Dropdown.Item>								
+                        <Dropdown.Item href="/orders" className="item channel_item"><i className="uil uil-box icon__1"></i>My Orders</Dropdown.Item>								
+                        <Dropdown.Item href="/wishlist" className="item channel_item"><i className="uil uil-heart icon__1"></i>My Wishlist</Dropdown.Item>								
+                        <Dropdown.Item href="/wallet" className="item channel_item"><i className="uil uil-usd-circle icon__1"></i>My Wallet</Dropdown.Item>								
+                        <Dropdown.Item href="/address" className="item channel_item"><i className="uil uil-location-point icon__1"></i>My Address</Dropdown.Item>								
+                        <Dropdown.Item href="/offers" className="item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
+                        <Dropdown.Item href="/faq" className="item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								
+                        <Logout/>
+                    </Dropdown.Menu>
+                </Dropdown>
+            </li>
+        </>
+    )
+
+}
+
+
+
+function LocationDropDownItem({warehouse}){
+
+    const dispatch = useDispatch()
+
+    return(
+        <Dropdown.Item className="item channel_item" onClick={()=>dispatch(setSelectedWarehouse(warehouse.id))}>
+            <i className="uil uil-location-point"></i>
+            {warehouse.name}
+        </Dropdown.Item>
+    )
+    
+
+}
+
 
 
 function Navbar(){
+    
+    const dispatch = useDispatch();
+    const {user, isAuthenticated} = useSelector((store)=>store.user)
+    const selectedWarehouse= useSelector((store)=>store.selectedWarehouse)
+    const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
+
+
+
+    //get authenticated user if any
+    useEffect(()=>{
+        dispatch(fetchUser())
+    },[])
+
+    
+     useEffect(()=>{
+        dispatch(getWarehouses())
+    },[])
+
+
+    useEffect(()=>{
+        dispatch(getSelectedWarehouse())
+    },[])
+
 
     return (
-    <>
+        <>
             {/* Category Model */}
             <CategoryModel/>
             
@@ -64,24 +175,16 @@ function Navbar(){
                             <Dropdown.Toggle className="ui inline dropdown loc-title">
                                 <div className="text" >
                                     <i className="uil uil-location-point"></i>
-                                        Gurugram
+                                        {!selectedWarehouse.isLoading && selectedWarehouse.warehouse.warehouse.name}
                                 </div>
                             </Dropdown.Toggle>
 
-                            <Dropdown.Menu className="menu dropdown_loc" >
-                                    <Dropdown.Item className="item channel_item" href="#/action-1">
-                                        <i className="uil uil-location-point"></i>
-                                        Gurugram
-                                    </Dropdown.Item>
-                                    <Dropdown.Item className="item channel_item" href="#/action-2">
-                                        <i className="uil uil-location-point"></i>
-                                        New Delhi
-                                    </Dropdown.Item>
-                                    <Dropdown.Item className="item channel_item" href="#/action-3">
-                                        <i className="uil uil-location-point"></i>
-                                        Bangaluru
-                                    </Dropdown.Item>
-                            </Dropdown.Menu>
+                            {!isLoading &&  <Dropdown.Menu className="menu dropdown_loc" >
+                                    {warehouses.map((warehouse)=>{
+                                            return <LocationDropDownItem key={warehouse.id} warehouse={warehouse} />
+                                        })}
+
+                            </Dropdown.Menu>}
                         </Dropdown>
 
                         <div className="search120">
@@ -103,32 +206,10 @@ function Navbar(){
                                 <li>
                                     <Link to="/help" className="offer-link"><i className="uil uil-question-circle"></i>Help</Link>
                                 </li>
-                                <li>
-                                    <Link to="/wishlist" className="option_links" title="Wishlist"><i className='uil uil-heart icon_wishlist'></i><span className="noti_count1">3</span></Link>
-                                </li>	
+
+                                {isAuthenticated && <UserAuthenticatedItems user={user} />}
+                                {!isAuthenticated && <GuestUserItems/>}
                                 
-
-                                <li className="ui dropdown"> 
-                                    <Dropdown className="opts_account" >
-                                        <Dropdown.Toggle  >
-                                            <img src={img5} alt=""/>
-                                            <span className="user__name">John Doe</span>
-                                        </Dropdown.Toggle>
-                                        
-                                        <Dropdown.Menu  >
-                                            <Dropdown.Item href="/dashboard" className="item channel_item"><i className="uil uil-apps icon__1"></i>Dashbaord</Dropdown.Item>								
-                                            <Dropdown.Item href="/orders" className="item channel_item"><i className="uil uil-box icon__1"></i>My Orders</Dropdown.Item>								
-                                            <Dropdown.Item href="/wishlist" className="item channel_item"><i className="uil uil-heart icon__1"></i>My Wishlist</Dropdown.Item>								
-                                            <Dropdown.Item href="/dashboard/wallet" className="item channel_item"><i className="uil uil-usd-circle icon__1"></i>My Wallet</Dropdown.Item>								
-                                            <Dropdown.Item href="/dashboard/addresses" className="item channel_item"><i className="uil uil-location-point icon__1"></i>My Address</Dropdown.Item>								
-                                            <Dropdown.Item href="/offers" className="item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
-                                            <Dropdown.Item href="/faq" className="item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								
-                                            <Dropdown.Item href="/logout" className="item channel_item"><i className="uil uil-lock-alt icon__1"></i>Logout</Dropdown.Item>								
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </li>
-
-
                             </ul>
                         </div>
                     </div>
@@ -143,9 +224,9 @@ function Navbar(){
                                 <button className="navbar-toggler menu_toggle_btn" type="button" data-target="#navbarSupportedContent"><i className="uil uil-bars"></i></button>
                                 <div className="collapse navbar-collapse d-flex flex-column flex-lg-row flex-xl-row justify-content-lg-end bg-dark1 p-3 p-lg-0 mt1-5 mt-lg-0 mobileMenu" id="navbarSupportedContent">
                                     <ul className="navbar-nav main_nav align-self-stretch">
-                                        <li className="nav-item"><a href="index.html" className="nav-link active" title="Home">Home</a></li>
-                                        <li className="nav-item"><a href="shop_grid.html" className="nav-link new_item" title="New Products">New Products</a></li>
-                                        <li className="nav-item"><a href="shop_grid.html" className="nav-link" title="Featured Products">Featured Products</a></li>
+                                        <li className="nav-item"><Link to="/" className="nav-link active" title="Home">Home</Link></li>
+                                        <li className="nav-item"><Link to="shop_grid.html" className="nav-link new_item" title="New Products">New Products</Link></li>
+                                        <li className="nav-item"><Link to="shop_grid.html" className="nav-link" title="Featured Products">Featured Products</Link></li>
                                         <li className="nav-item">
 
                                             <Dropdown>
@@ -198,7 +279,7 @@ function Navbar(){
                 </div>
             </header>
 	
-    </>
+         </>
 
     
 

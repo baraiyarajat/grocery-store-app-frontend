@@ -23,13 +23,13 @@ String.prototype.getDecimals || (String.prototype.getDecimals = function() {
 });
 
 // wishlist script //
-$(document).ready(function() {
-	$('.like-icon, .like-button').on('click', function(e) {
-		e.preventDefault();
-		$(this).toggleClass('liked');
-		$(this).children('.like-icon').toggleClass('liked');
-	});
-});
+// $(document).ready(function() {
+// 	$('.like-icon, .like-button').on('click', function(e) {
+// 		e.preventDefault();
+// 		$(this).toggleClass('liked');
+// 		$(this).children('.like-icon').toggleClass('liked');
+// 	});
+// });
 
 // menu script //
 $ (document).ready(function() {

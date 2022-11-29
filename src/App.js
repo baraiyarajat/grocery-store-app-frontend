@@ -12,8 +12,8 @@ import './assets/css/step-wizard.css';
 
 // // Vendor Stylesheets
 import './assets/vendor/fontawesome-free/css/all.min.css';
-import './assets/vendor/OwlCarousel/assets/owl.carousel.css';
-import './assets/vendor/OwlCarousel/assets/owl.theme.default.min.css';
+// import './assets/vendor/OwlCarousel/assets/owl.carousel.css';
+// import './assets/vendor/OwlCarousel/assets/owl.theme.default.min.css';
 import './assets/vendor/bootstrap/css/bootstrap.min.css';
 import './assets/vendor/semantic/semantic.min.css';
 
@@ -28,7 +28,11 @@ import Wishlist from './pages/wishlist';
 import Orders from './pages/orders';
 import Wallet from './pages/wallet';
 import Address from './pages/address';
+import AddNewAddress from './pages/address/addNewAddress';
 import Rewards from './pages/rewards';
+import ProductsByCategory from './pages/productsByCategory';
+import SingleProduct from './pages/singleProduct';
+
 
 
 
@@ -45,7 +49,10 @@ function App() {
         <Route path='/orders' element={<Orders/>} ></Route>
         <Route path='/wallet' element={<Wallet/>} ></Route>
         <Route path='/address' element={<Address/>} ></Route>
+        <Route path='/address/add-new-address' element={<AddNewAddress/>} ></Route>
         <Route path='/rewards' element={<Rewards/>} ></Route>
+        <Route path='/products-by-category/:categorySlug' element={<ProductsByCategory/>} ></Route>
+        <Route path='/products/:productSlug' element={<SingleProduct/>}  ></Route>
         <Route path='*' element={<Error/>} ></Route>
       </Routes>
     </Router>

@@ -37,14 +37,15 @@ function Register(){
                                 "last_name":user.lastName,
                                 "email":user.email,
                                 "phone_number":user.phoneNumber,
-                                "password":user.password}
+                                "password":user.password,
+                                "confirmPassword":user.confirmPassword}
 
         
 
 
 
         //Register Account API call
-        axios.post('http://127.0.0.1:8000/accounts/register/', registerData)
+        axios.post('https://127.0.0.1:8000/accounts/register', registerData)
         .then((response) => {
             console.log("User Registered")
             //Redirect to login
@@ -55,15 +56,8 @@ function Register(){
             //Add error message
 
         });
-
-        // console.log("Register Form submit")
-        
-        
+   
     }
-
-
-
-
 
     return(
     <>

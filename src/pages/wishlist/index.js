@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 
 //Includes
 import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteWishlistProduct, getWishlist } from '../../store/wishlist/wishlistSlice';
+import { getSelectedWarehouse } from '../../store/warehouse/selectedWarehouseSlice';
+
+
+function WishlistItem({wishlistProduct}){
+
+    
+
+    const dispatch = useDispatch()
+
+    const handleDeleteWishlistProduct = () =>{
+        
+        dispatch(deleteWishlistProduct(wishlistProduct.id))
+    }
+
+
+    
+    return(
+        <div className="cart-item">
+            <div className="cart-product-img">
+                <img src="images/product/img-11.jpg" alt=""/>
+                { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
+            </div>
+            <div className="cart-text">
+                <h4>{wishlistProduct.warehouse_product.product.name}</h4>
+                { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.get_discounted_price} <span>${wishlistProduct.warehouse_product.price}</span></div>}
+                { wishlistProduct.warehouse_product.discount_rate===0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.price} </div>}
+                <button type="button" onClick={ ()=> handleDeleteWishlistProduct(wishlistProduct.id)} className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>
+            </div>		
+        </div>
+    )
+}
 
 
 function Wishlist(){
+
+    const {wishlistProducts, isWishlistLoading } = useSelector((store)=>store.wishlist)
+    const {warehouse} = useSelector((store)=>store.selectedWarehouse)
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+       dispatch(getWishlist())
+    },[warehouse])
+
 
     return (
         <>
@@ -20,7 +62,7 @@ function Wishlist(){
                                 <div className="col-md-12">
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
-                                            <li className="breadcrumb-item"><a href="index.html">Home</a></li>
+                                            <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                                             <li className="breadcrumb-item active" aria-current="page">User Dashboard</li>
                                         </ol>
                                     </nav>
@@ -75,38 +117,12 @@ function Wishlist(){
                                             <div className="col-lg-12 col-md-12">
                                                 <div className="pdpt-bg">
                                                     <div className="wishlist-body-dtt">
-                                                        <div className="cart-item">
-                                                            <div className="cart-product-img">
-                                                                <img src="images/product/img-11.jpg" alt=""/>
-                                                                <div className="offer-badge">4% OFF</div>
-                                                            </div>
-                                                            <div className="cart-text">
-                                                                <h4>Product Title Here</h4>
-                                                                <div className="cart-item-price">$15 <span>$18</span></div>
-                                                                <button type="button" className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>
-                                                            </div>		
-                                                        </div>
-                                                        <div className="cart-item">
-                                                            <div className="cart-product-img">
-                                                                <img src="images/product/img-2.jpg" alt=""/>
-                                                                <div className="offer-badge">1% OFF</div>
-                                                            </div>
-                                                            <div className="cart-text">
-                                                                <h4>Product Title Here</h4>
-                                                                <div className="cart-item-price">$9.9 <span>$10</span></div>
-                                                                <button type="button" className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>
-                                                            </div>		
-                                                        </div>
-                                                        <div className="cart-item">
-                                                            <div className="cart-product-img">
-                                                                <img src="images/product/img-14.jpg" alt=""/>
-                                                            </div>
-                                                            <div className="cart-text">
-                                                                <h4>Product Title Here</h4>
-                                                                <div className="cart-item-price">$12</div>
-                                                                <button type="button" className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>
-                                                            </div>		
-                                                        </div>
+                                                        
+                                                        
+                                                        { !isWishlistLoading && wishlistProducts.map((wishlistProduct)=>{
+                                                            return <WishlistItem key={wishlistProduct.id} wishlistProduct={wishlistProduct} />
+                                                        })}
+                                                    
                                                     </div>
                                                 </div>
                                             </div>

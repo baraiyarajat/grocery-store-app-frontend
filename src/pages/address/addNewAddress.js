@@ -1,77 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 
 //Includes
-import Navbar from '../includes/Navbar';
-import Footer from '../includes/Footer';
-import { useDispatch, useSelector } from 'react-redux';
-import {getAddresses, deleteAddress} from '../../store/address/addressSlice'
+// import Navbar from '../includes/Navbar';
+// import Footer from '../includes/Footer';
 
-
-const capitalizeFirst = str => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
-function AddressItem({address}){
-
-    const getAddressIcon = (address_type) =>{
-        if(address_type==='home'){
-            return <i className="uil uil-home-alt"/>
-        }else if (address_type==='office'){
-            return <i className="uil uil-building"/>
-        }else{
-            return <i className="uil uil-map"/>
-        }
-    }
-
-    const dispatch = useDispatch()
-
-    const handleDeleteAddress = async  (addressId) =>{
-        
-        await Promise.all([
-        dispatch(deleteAddress(addressId)),
-        ])
-
-        return dispatch(getAddresses())
-    }
-
-    return(
-        <>
-            <div className="address-item">
-                <div className="address-icon1">
-                    {getAddressIcon(address.address_type)}
-                </div>
-                <div className="address-dt-all">
-                    <h4>{capitalizeFirst(address.address_type)}</h4>
-                    <p>{address.address_line_1}, {address.address_line_2}, {address.city.name}, {address.pincode} </p>
-                    <ul className="action-btns">
-                        {/* <li><a href="#" className="action-btn"><i className="uil uil-edit"></i></a></li> */}
-                        <li><button  className="action-btn"><i className="uil uil-edit"></i></button></li>
-                        <li><button onClick={()=>handleDeleteAddress(address.id)} className="action-btn"><i className="uil uil-trash-alt"></i></button></li>
-                    </ul>
-                </div>
-            </div>
-        </>
-    )
-}
-
-
-function Address(){
-
-    const dispatch = useDispatch()
-    const {addresses, isLoading} = useSelector((store)=>store.address)
-
-
-    useEffect(()=>{
-        dispatch(getAddresses())
-    },[])
-
-
+function AddNewAddress(){
     return (
-        
         <>
-            <Navbar/>
+            {/* <Navbar/>
                 <div className="wrapper">
                     <div className="gambo-Breadcrumb">
                         <div className="container">
@@ -125,27 +63,14 @@ function Address(){
                                 </div>
                                 <div className="col-lg-9 col-md-8">
                                     <div className="dashboard-right">
-                                        <div className="row">
+                                         <div className="row">
                                             <div className="col-md-12">
                                                 <div className="main-title-tab">
-                                                    <h4><i className="uil uil-location-point"></i>My Address</h4>
+                                                    <h4><i className="uil uil-location-point"></i>Add New Address</h4>
                                                 </div>
                                             </div>
-                                            <div className="col-lg-12 col-md-12">
-                                                <div className="pdpt-bg">
-                                                    <div className="pdpt-title">
-                                                        <h4>My Address</h4>
-                                                    </div>
-                                                    <div className="address-body">
-                                                        {/* <a href="#" className="add-address hover-btn" data-toggle="modal" data-target="#address_model">Add New Address</a>       */}
-                                                        <Link to='/address/add-new-address' className="add-address hover-btn"> Add New Address</Link>
-                                                        
-                                                        {addresses.map((address)=> <AddressItem key={address.id} address={address}/>)}
-                                                                    
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                         </div>
                                     </div>
                                 </div>
                             </div>	
@@ -153,14 +78,10 @@ function Address(){
                     </div>	
                 </div>
 
-
-
-
-            <Footer/>
+            <Footer/> */}
         </>
     )
-
 }
 
 
-export default Address;
+export default AddNewAddress;
