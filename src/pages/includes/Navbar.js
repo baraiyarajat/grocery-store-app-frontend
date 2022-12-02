@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect } from "react";
 
 import {Link} from 'react-router-dom';
-import axios from "axios";
 
 //Components
 import CartSidebar from "./components/CartSidebar";
@@ -21,21 +19,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { fetchUser } from "../../store/user/userSlice";
 import { getWarehouses } from "../../store/warehouse/warehouseSlice";
 import { getSelectedWarehouse, setSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
-
-//Category Icons
-// import icon1 from '../../assets/images/category/icon-1.svg'
-// import icon2 from '../../assets/images/category/icon-2.svg'
-// import icon3 from '../../assets/images/category/icon-3.svg'
-// import icon4 from '../../assets/images/category/icon-4.svg'
-// import icon5 from '../../assets/images/category/icon-5.svg'
-// import icon6 from '../../assets/images/category/icon-6.svg'
-// import icon7 from '../../assets/images/category/icon-7.svg'
-// import icon8 from '../../assets/images/category/icon-8.svg'
-// import icon9 from '../../assets/images/category/icon-9.svg'
-
-
 import {useDispatch, useSelector} from 'react-redux'
-import Button from "react-bootstrap/esm/Button";
 import { getWishlist } from "../../store/wishlist/wishlistSlice";
 
 
@@ -68,7 +52,7 @@ function UserAuthenticatedItems({user}){
 
     useEffect(()=>{
        dispatch(getWishlist())
-    },[warehouse])
+    },[dispatch, warehouse])
 
     // console.log(wishlistProducts)
 
@@ -133,17 +117,17 @@ function Navbar(){
     //get authenticated user if any
     useEffect(()=>{
         dispatch(fetchUser())
-    },[])
+    },[dispatch])
 
     
      useEffect(()=>{
         dispatch(getWarehouses())
-    },[])
+    },[dispatch])
 
 
     useEffect(()=>{
         dispatch(getSelectedWarehouse())
-    },[])
+    },[dispatch])
 
 
     return (
@@ -225,11 +209,11 @@ function Navbar(){
                                 <div className="collapse navbar-collapse d-flex flex-column flex-lg-row flex-xl-row justify-content-lg-end bg-dark1 p-3 p-lg-0 mt1-5 mt-lg-0 mobileMenu" id="navbarSupportedContent">
                                     <ul className="navbar-nav main_nav align-self-stretch">
                                         <li className="nav-item"><Link to="/" className="nav-link active" title="Home">Home</Link></li>
-                                        <li className="nav-item"><Link to="shop_grid.html" className="nav-link new_item" title="New Products">New Products</Link></li>
+                                        <li className="nav-item"><Link to="/new-products" className="nav-link new_item" title="New Products">New Products</Link></li>
                                         <li className="nav-item"><Link to="shop_grid.html" className="nav-link" title="Featured Products">Featured Products</Link></li>
-                                        <li className="nav-item">
+                                        {/* <li className="nav-item"> */}
 
-                                            <Dropdown>
+                                            {/* <Dropdown>
                                                 <Dropdown.Toggle >
                                                     Pages
                                                 </Dropdown.Toggle>
@@ -249,18 +233,18 @@ function Navbar(){
                                                     <Dropdown.Item href="/contact-us" className="item channel_item page__links">Contact Us</Dropdown.Item>
                                                     
                                                 </Dropdown.Menu>
-                                            </Dropdown>
+                                            </Dropdown> */}
 
-                                        </li>
-                                        <li className="nav-item">
+                                        {/* </li> */}
+                                        {/* <li className="nav-item">
                                             <div className="ui icon top left dropdown nav__menu">
-                                                <a className="nav-link" title="Blog">Blog <i className="uil uil-angle-down"></i></a>
+                                                <Link className="nav-link" title="Blog">Blog <i className="uil uil-angle-down"></i></Link>
                                                 <div className="menu dropdown_page">
                                                     <Link to="/blog" className="item channel_item page__links">Our Blog</Link>
                                                     <Link to="/blog-detail-view" className="item channel_item page__links">Blog Detail View</Link>
                                                 </div>
                                             </div>
-                                        </li>	
+                                        </li>	 */}
                                         <li className="nav-item"><a href="contact_us.html" className="nav-link" title="Contact">Contact Us</a></li>
                                     </ul>
                                 </div>

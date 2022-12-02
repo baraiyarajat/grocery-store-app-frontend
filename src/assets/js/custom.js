@@ -66,9 +66,9 @@ $('.ui.dropdown')
 // === Model === //
 $('.ui.modal')
   .modal({
-    blurring: true
+    blurring: false
   })
-  .modal('show')
+//   .modal('show')
 ;
 
 // === Tab === //

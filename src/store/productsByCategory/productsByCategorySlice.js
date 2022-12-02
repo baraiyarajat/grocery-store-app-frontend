@@ -29,7 +29,21 @@ export const getWarehouseProductsByCategory = createAsyncThunk(
 const productsByCategorySlice = createSlice({
     name:'productsByCategory',
     initialState:initialProductsByCategoryState,
-    reducers:{},
+    reducers:{
+        sortProducts : (state,action) =>{
+            const sortType = action.payload
+
+            if (sortType ==='alphabetical'){
+                state.products = state.products.sort((a,b) => (a.product.name > b.product.name) ? 1 : ((b.product.name > a.product.name) ? -1 : 0))
+            }else if (sortType === 'price-low-to-high'){
+                state.products = state.products.sort((a,b) => (a.get_discounted_price > b.get_discounted_price) ? 1 : ((b.get_discounted_price > a.get_discounted_price) ? -1 : 0))
+            }else if (sortType === 'price-high-to-low'){
+                state.products = state.products.sort((a,b) => (a.get_discounted_price < b.get_discounted_price) ? 1 : ((b.get_discounted_price < a.get_discounted_price) ? -1 : 0))
+            }else if (sortType === 'percentage-off'){
+                state.products = state.products.sort((a,b) => (a.discount_rate < b.discount_rate) ? 1 : ((b.discount_rate < a.discount_rate) ? -1 : 0))
+            }
+        }
+    },
     extraReducers:(builder) =>  {
         builder
             .addCase(getWarehouseProductsByCategory.pending, (state) => {
@@ -43,6 +57,7 @@ const productsByCategorySlice = createSlice({
 },
 })
 
+export const {sortProducts} = productsByCategorySlice.actions;
 
 
 export default productsByCategorySlice.reducer;

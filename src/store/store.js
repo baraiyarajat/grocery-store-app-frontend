@@ -7,7 +7,9 @@ import productsByCategoryReducer from './productsByCategory/productsByCategorySl
 import categoryReducer from './category/categorySlice'
 import wishlistReducer from './wishlist/wishlistSlice'
 import singleProductReducer from './singleProduct/singleProductSlice'
-
+import categoriesReducer from './category/categoriesSlice'
+import productsByCategorySortReducer from "./productsByCategory/productsByCategorySortSlice";
+import newProductsReducer from './newProducts/newProductsSlice'
 
 export const store = configureStore({
     reducer:{
@@ -16,7 +18,10 @@ export const store = configureStore({
         selectedWarehouse: selectedWarehouseReducer,
         address: addressReducer,
         productsByCategory: productsByCategoryReducer,
+        productsByCategorySort: productsByCategorySortReducer,
+        newProducts:newProductsReducer,
         category:categoryReducer,
+        categories:categoriesReducer,
         wishlist:wishlistReducer,
         singleProduct:singleProductReducer,
         

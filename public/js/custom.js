@@ -68,7 +68,7 @@ $('.ui.modal')
   .modal({
     blurring: true
   })
-  .modal('show')
+//   .modal('show')
 ;
 
 // === Tab === //

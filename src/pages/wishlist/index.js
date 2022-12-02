@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 
 //Includes
@@ -7,7 +6,7 @@ import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteWishlistProduct, getWishlist } from '../../store/wishlist/wishlistSlice';
-import { getSelectedWarehouse } from '../../store/warehouse/selectedWarehouseSlice';
+
 
 
 function WishlistItem({wishlistProduct}){
@@ -21,12 +20,13 @@ function WishlistItem({wishlistProduct}){
         dispatch(deleteWishlistProduct(wishlistProduct.id))
     }
 
+    const imageUrl = `http://127.0.0.1:8000${wishlistProduct.warehouse_product.product.image}`
 
     
     return(
         <div className="cart-item">
             <div className="cart-product-img">
-                <img src="images/product/img-11.jpg" alt=""/>
+                <img src={imageUrl} alt=""/>
                 { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
             </div>
             <div className="cart-text">
@@ -48,7 +48,7 @@ function Wishlist(){
 
     useEffect(()=>{
        dispatch(getWishlist())
-    },[warehouse])
+    },[dispatch, warehouse])
 
 
     return (
@@ -83,7 +83,7 @@ function Wishlist(){
                                             </div>
                                         </div>
                                         <h4>Johe Doe</h4>
-                                        <p>+91999999999<a href="#"><i className="uil uil-edit"></i></a></p>
+                                        <p>+91999999999<Link to="#"><i className="uil uil-edit"></i></Link></p>
                                         <div className="earn-points"><img src="images/Dollar.svg" alt=""/>Points : <span>20</span></div>
                                     </div>
                                 </div>

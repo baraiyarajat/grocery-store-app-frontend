@@ -50,7 +50,7 @@ function SingleProduct (){
                                 <div className="col-md-12">
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
-                                            <li className="breadcrumb-item"><a href="index.html">Home</a></li>
+                                            <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                                             {!isSingleProductLoading &&  <li className="breadcrumb-item"><Link to={`/products-by-category/${singleProduct.product.category.slug}`}>{singleProduct.product.category.name}</Link></li>}
                                             {!isSingleProductLoading && <li className="breadcrumb-item active" aria-current="page">{singleProduct.product.name}</li>}
                                         </ol>

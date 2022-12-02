@@ -1,18 +1,18 @@
-import { useParams } from "react-router-dom";
-import Navbar from "../includes/Navbar";
-import Footer from "../includes/Footer";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getNewWarehouseProducts } from "../../store/newProducts/newProductsSlice";
 import { Link } from "react-router-dom";
-import { getCategoryBySlug } from "../../store/category/categorySlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useDebugValue, useEffect } from "react";
-import { getWarehouseProductsByCategory, sortProducts } from "../../store/productsByCategory/productsByCategorySlice";
-import { addWishlistProduct, getWishlist, deleteWishlistProduct } from "../../store/wishlist/wishlistSlice";
+import { getWishlist } from "../../store/wishlist/wishlistSlice";
 
-import { DropdownButton } from "react-bootstrap";
-import { Dropdown } from "react-bootstrap";
-import { setProductsByCategorySortOption } from "../../store/productsByCategory/productsByCategorySortSlice";
 
-function ProductItem(params){
+import { addWishlistProduct, deleteWishlistProduct } from "../../store/wishlist/wishlistSlice";
+
+import Footer from "../includes/Footer";
+import Navbar from "../includes/Navbar";
+
+
+function NewProductItem(params){
 
     
     const dispatch = useDispatch()
@@ -69,57 +69,27 @@ function ProductItem(params){
 
 
 
-function ProductsByCategory(){
+function NewProducts(){
 
-    const params = useParams();
-    const categorySlug = params.categorySlug
     const dispatch = useDispatch()
     const {warehouse} = useSelector((store)=>store.selectedWarehouse)
-    const {category, isLoading} = useSelector((store)=>store.category)
-    const {products,isProductsLoading} = useSelector((store)=>store.productsByCategory)
-    const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
-    const {sortOption, isSortOptionLoading}  = useSelector((store)=>store.productsByCategorySort)
-
+    const {newProducts, isNewProductsLoading} = useSelector((store)=>store.newProducts)
+    const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)   
 
     useEffect(()=>{
-        dispatch(getCategoryBySlug(categorySlug))
-        
-    },[categorySlug, dispatch])
-
-
-    useEffect(()=>{
-        dispatch(getWarehouseProductsByCategory(categorySlug))
-    },[warehouse, category, dispatch, categorySlug])
+        dispatch(getNewWarehouseProducts())
+    },[warehouse, dispatch])
 
     useEffect(()=>{
         dispatch(getWishlist())
-    },[warehouse, category, dispatch])
-
-    
-    const sortOptionsDict = {}
-    sortOptionsDict["alphabetical"] = "Alphabetical"
-    sortOptionsDict["price-low-to-high"] = "Price - Low to High"
-    sortOptionsDict["price-high-to-low"] = "Price - High to Low"
-    sortOptionsDict["percentage-off"] = "% Off - High to Low"
-
-
-    const handleSortOptions = (e) =>{
-        dispatch(setProductsByCategorySortOption(e))
-        
-        
-        dispatch(sortProducts(e))
-    }
-
-
-    useEffect(()=>{
-        dispatch(sortProducts(sortOption))
-    },[products])
+    },[warehouse, dispatch])
 
 
     return (
         <>
             <Navbar/>
                 <div className="wrapper">
+
                     <div className="gambo-Breadcrumb">
                         <div className="container">
                             <div className="row">
@@ -127,7 +97,7 @@ function ProductsByCategory(){
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
                                             <li className="breadcrumb-item"><Link to="/" >Home</Link></li>
-                                            { !isLoading && <li className="breadcrumb-item active" aria-current="page">{category.name}</li>}
+                                            <li className="breadcrumb-item active" aria-current="page">New Products</li>
                                         </ol>
                                     </nav>
                                 </div>
@@ -142,22 +112,14 @@ function ProductsByCategory(){
                                 <div className="col-lg-12">
                                     <div className="product-top-dt">
                                         <div className="product-left-title">
-                                            <h2>{category.name}</h2>
+                                            <h2>New Products</h2>
                                         </div>
-
-                                        {!isSortOptionLoading && <DropdownButton className="product-sort" title={sortOptionsDict[sortOption]} onSelect={handleSortOptions}>
-                                                    <Dropdown.Item eventKey="alphabetical">Alphabetical</Dropdown.Item>
-                                                    <Dropdown.Item eventKey="price-low-to-high">Price - Low to High</Dropdown.Item>
-                                                    <Dropdown.Item eventKey="price-high-to-low">Price - High to Low</Dropdown.Item>
-                                                    <Dropdown.Item eventKey="percentage-off">% Off - High to Low</Dropdown.Item>
-                                        </DropdownButton>}
-
                                     </div>
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                { !isLoading && !isProductsLoading && !isWishlistLoading  && <div className="row">
-                                    {products.map((product)=>{ 
+                                {!isNewProductsLoading && !isWishlistLoading  && <div className="row">
+                                    {newProducts.map((product)=>{ 
                                         
                                         const productId = product.id
                                         const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{
@@ -165,19 +127,20 @@ function ProductsByCategory(){
                                         })[0]
                                         const inWishlist = wishlistProduct && true
                                         
-                                        return <ProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist}/>})}
+                                        return <NewProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist}/>})}
                                 </div>}
                             </div>
                         </div>
                     </div>
 
 
-
                 </div>
             <Footer/>
         </>
     )
+
 }
 
 
-export default ProductsByCategory
+
+export default NewProducts;

@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
-
 import { Link } from 'react-router-dom';
 
 //Includes
@@ -15,17 +13,6 @@ import offer3Banner from '../../assets/images/banners/offer-3.jpg'
 import offer4Banner from '../../assets/images/banners/offer-4.jpg'
 import offer5Banner from '../../assets/images/banners/offer-5.jpg'
 
-import icon1 from '../../assets/images/category/icon-1.svg'
-import icon2 from '../../assets/images/category/icon-2.svg'
-import icon3 from '../../assets/images/category/icon-3.svg'
-import icon4 from '../../assets/images/category/icon-4.svg'
-import icon5 from '../../assets/images/category/icon-5.svg'
-import icon6 from '../../assets/images/category/icon-6.svg'
-import icon7 from '../../assets/images/category/icon-7.svg'
-import icon8 from '../../assets/images/category/icon-8.svg'
-import icon9 from '../../assets/images/category/icon-9.svg'
-import icon10 from '../../assets/images/category/icon-10.svg'
-import icon11 from '../../assets/images/category/icon-11.svg'
 
 import img1 from '../../assets/images/product/img-1.jpg'
 
@@ -34,18 +21,109 @@ import img1 from '../../assets/images/product/img-1.jpg'
 import OwlCarousel from "react-owl-carousel";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUser } from '../../store/user/userSlice';
-import warehouseSlice, { getWarehouses } from '../../store/warehouse/warehouseSlice';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { getCategories } from '../../store/category/categoriesSlice';
+import { getNewWarehouseProducts } from '../../store/newProducts/newProductsSlice';
+import { getWishlist } from '../../store/wishlist/wishlistSlice';
+import {addWishlistProduct, deleteWishlistProduct} from '../../store/wishlist/wishlistSlice'
+
+function CategoryItem(params){
+    const category = params.category
+    const imageUrl = `http://127.0.0.1:8000${category.image}`
+    return(
+        <div className="item">
+            <Link to={`/products-by-category/${category.slug}`} className="category-item">
+                <div className="cate-img">
+                    <img src={imageUrl} alt="category_image"/>
+                </div>
+                <h4>{category.name}</h4>
+            </Link>
+        </div>
+    )
+}
 
 
+function ProductItem({product, wishlistProduct, inWishlist}){
 
+    const dispatch = useDispatch()
+
+    const addToWishlistHandler = (e) =>{
+        e.preventDefault()
+        dispatch(addWishlistProduct(product.id))
+    }
+
+
+    const deleteFromWishlistHandler =  (e) =>{
+        e.preventDefault()
+        dispatch(deleteWishlistProduct(wishlistProduct.id))
+    }
+
+
+    const imageUrl = `http://127.0.0.1:8000${product.product.image}`
+
+    return(
+        <>
+            <div className="item">
+                <div className="product-item">
+                    <Link to={`/products/${product.product.slug}`} className="product-img">
+                        <img src={imageUrl} alt="product_image"/>
+                        <div className="product-absolute-options">
+                            <span className="offer-badge-1">New</span>
+                            {!inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                        
+                            {inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
+                        </div>
+                    </Link>
+                    <div className="product-text-dt">
+                        {product.stock>0 && <p>Available<span>(In Stock)</span></p>}
+                        {product.stock==0 && <p>Unavailable<span>(Out of Stock)</span></p>}
+                        {/* <p>Available<span>(In Stock)</span></p> */}
+                        <h4>{product.product.name}</h4>
+                        
+                        {product.discount_rate>0 && <div className="product-price">${product.get_discounted_price}<span>${product.price}</span></div>}
+                        {product.discount_rate===0 && <div className="product-price">${product.price}</div>}
+                        
+                        <div className="qty-cart">
+                            <div className="quantity buttons_added">
+                                {/* <input type="button" value="-" className="minus minus-btn"/>
+                                <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
+                                <input type="button" value="+" className="plus plus-btn"/> */}
+                            </div>
+                            <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+
+}
 
 
 
 function Home(){
 
+    const {categories, isCategoriesLoading} = useSelector((store)=>store.categories)
+    const {warehouse,isLoading} = useSelector((store)=>store.selectedWarehouse)
+    const {newProducts, isNewProductsLoading} = useSelector((store)=>store.newProducts)
+    const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)   
 
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+        dispatch(getNewWarehouseProducts())
+    },[warehouse, dispatch])
+    
+    
+    useEffect(()=>{
+        dispatch(getCategories())
+    },[dispatch])
+
+    useEffect(()=>{
+        dispatch(getWishlist())
+    },[warehouse, dispatch])
+    
     return(
         <>
             {/* Navbar */}
@@ -158,94 +236,15 @@ function Home(){
                             </div>
                             <div className="col-md-12">
                                 <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    <div className="item">
-                                        <Link to="/products-by-category/vegetables-and-fruits" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon1} alt=""/>
-                                            </div>
-                                            <h4>Vegetables & Fruits</h4>
-                                        </Link>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon2} alt=""/>
-                                            </div>
-                                            <h4> Grocery & Staples </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon3} alt=""/>
-                                            </div>
-                                            <h4> Dairy & Eggs </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon4} alt=""/>
-                                            </div>
-                                            <h4> Beverages </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon5} alt=""/>
-                                            </div>
-                                            <h4> Snacks </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon6} alt=""/>
-                                            </div>
-                                            <h4> Home Care </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon7} alt=""/>
-                                            </div>
-                                            <h4> Noodles & Sauces </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon8} alt=""/>
-                                            </div>
-                                            <h4> Personal Care </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon9} alt=""/>
-                                            </div>
-                                            <h4> Pet Care </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon10} alt=""/>
-                                            </div>
-                                            <h4> Meat & Seafood </h4>
-                                        </a>
-                                    </div>
-                                    <div className="item">
-                                        <a href="#" className="category-item">
-                                            <div className="cate-img">
-                                                <img src={icon11} alt=""/>
-                                            </div>
-                                            <h4> Electronics </h4>
-                                        </a>
-                                    </div>
+
+                                    {! isCategoriesLoading && 
+                                        
+                                        categories.map((category) =>{
+                                            return <CategoryItem key={category.id} category={category}/>
+                                        })
+                                        
+                                    }
+
                                 </OwlCarousel>
                             </div>
                         </div>
@@ -539,84 +538,22 @@ function Home(){
                                         <span>For You</span>
                                         <h2>Added New Products</h2>
                                     </div>
-                                    <a href="#" className="see-more-btn">See All</a>
+                                    <Link to="/new-products" className="see-more-btn">See All</Link>
                                 </div>
                             </div>
                             <div className="col-md-12">
                                 <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-10.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">New</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$12 <span>$15</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-10.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">New</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$12 <span>$15</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-9.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">New</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$10</div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {!isNewProductsLoading &&  !isWishlistLoading && !isLoading && newProducts.map((product)=>{
+
+                                        const productId = product.id
+                                        const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{
+                                            return wishlistProduct.warehouse_product.id === productId 
+                                        })[0]
+                                        
+                                        const inWishlist = wishlistProduct && true
+                                        
+                                        return <ProductItem key={product.id} product={product} inWishlist={inWishlist} wishlistProduct={wishlistProduct}  />
+                                    })}
                                 </OwlCarousel>
                             </div>
                         </div>
