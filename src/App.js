@@ -28,10 +28,11 @@ import Wishlist from './pages/wishlist';
 import Orders from './pages/orders';
 import Wallet from './pages/wallet';
 import Address from './pages/address';
-import AddNewAddress from './pages/address/addNewAddress';
+
 import Rewards from './pages/rewards';
 import ProductsByCategory from './pages/productsByCategory';
 import SingleProduct from './pages/singleProduct';
+import NewProducts from './pages/newProducts';
 
 
 
@@ -48,9 +49,9 @@ function App() {
         <Route path='/wishlist' element={<Wishlist/>} ></Route>
         <Route path='/orders' element={<Orders/>} ></Route>
         <Route path='/wallet' element={<Wallet/>} ></Route>
-        <Route path='/address' element={<Address/>} ></Route>
-        <Route path='/address/add-new-address' element={<AddNewAddress/>} ></Route>
+        <Route path='/address' element={<Address/>} ></Route>        
         <Route path='/rewards' element={<Rewards/>} ></Route>
+        <Route path='/new-products' element={<NewProducts/>}></Route>
         <Route path='/products-by-category/:categorySlug' element={<ProductsByCategory/>} ></Route>
         <Route path='/products/:productSlug' element={<SingleProduct/>}  ></Route>
         <Route path='*' element={<Error/>} ></Route>
