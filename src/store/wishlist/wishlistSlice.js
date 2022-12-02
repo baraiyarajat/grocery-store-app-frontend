@@ -73,7 +73,7 @@ const wishlistSlice = createSlice({
         }).addCase(deleteWishlistProduct.fulfilled, (state,action)=>{
             state.isWishlistLoading = false
             state.wishlistProducts =  state.wishlistProducts.filter((wishlistProduct)=>{ return wishlistProduct.id !==action.payload.wishlist_product_id})
-            
+            console.log("Wishlist Product deleted")
 
         }).addCase(deleteWishlistProduct.rejected, (state)=>{
             state.isWishlistLoading = false
@@ -89,7 +89,8 @@ const wishlistSlice = createSlice({
             if(!wishlistProductExists){
                 state.wishlistProducts.push(action.payload)
             }
-
+            
+            console.log("Wishlist Product Added")
 
         }).addCase(addWishlistProduct.rejected,(state)=>{
             state.isWishlistLoading = false
