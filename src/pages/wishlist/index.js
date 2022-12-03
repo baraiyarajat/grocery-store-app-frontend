@@ -25,12 +25,14 @@ function WishlistItem({wishlistProduct}){
     
     return(
         <div className="cart-item">
-            <div className="cart-product-img">
-                <img src={imageUrl} alt=""/>
-                { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
-            </div>
+            <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} >
+                <div className="cart-product-img">
+                    <img src={imageUrl} height="130" widht="130" alt=""/>
+                    { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
+                </div>
+            </Link>
             <div className="cart-text">
-                <h4>{wishlistProduct.warehouse_product.product.name}</h4>
+                <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} ><h4>{wishlistProduct.warehouse_product.product.name}</h4></Link>
                 { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.get_discounted_price} <span>${wishlistProduct.warehouse_product.price}</span></div>}
                 { wishlistProduct.warehouse_product.discount_rate===0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.price} </div>}
                 <button type="button" onClick={ ()=> handleDeleteWishlistProduct(wishlistProduct.id)} className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>

@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState } from "react";
 import {Link} from 'react-router-dom';
 
 //Components
@@ -7,7 +6,7 @@ import CartSidebar from "./components/CartSidebar";
 import SearchModel from "./components/SearchModel";
 import CategoryModel from "./components/CategoryModel";
 
-// //Images
+//Images
 import darkLogo1 from '../../assets/images/dark-logo-1.svg'
 import logo from '../../assets/images/logo.svg'
 import darkLogo from '../../assets/images/dark-logo.svg'
@@ -21,6 +20,9 @@ import { getWarehouses } from "../../store/warehouse/warehouseSlice";
 import { getSelectedWarehouse, setSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
 import {useDispatch, useSelector} from 'react-redux'
 import { getWishlist } from "../../store/wishlist/wishlistSlice";
+
+
+import { Modal, Button } from "react-bootstrap";
 
 
 function GuestUserItems(){
@@ -41,6 +43,7 @@ function Logout(){
         <Dropdown.Item ><i className="uil uil-lock-alt icon__1" ></i>Logout</Dropdown.Item>
     </>)
 }
+
 
 
 function UserAuthenticatedItems({user}){
@@ -64,20 +67,20 @@ function UserAuthenticatedItems({user}){
             
 
             <li className="ui dropdown"> 
-                <Dropdown className="opts_account" >
-                    <Dropdown.Toggle  >
+                <Dropdown className="opts_account btn" >
+                    <Dropdown.Toggle  variant="">
                         <img src={img5} alt=""/>
                         <span className="user__name">{user.first_name} {user.last_name}</span>
                     </Dropdown.Toggle>
                     
-                    <Dropdown.Menu  >
-                        <Dropdown.Item href="/dashboard" className="item channel_item"><i className="uil uil-apps icon__1"></i>Dashbaord</Dropdown.Item>								
-                        <Dropdown.Item href="/orders" className="item channel_item"><i className="uil uil-box icon__1"></i>My Orders</Dropdown.Item>								
-                        <Dropdown.Item href="/wishlist" className="item channel_item"><i className="uil uil-heart icon__1"></i>My Wishlist</Dropdown.Item>								
-                        <Dropdown.Item href="/wallet" className="item channel_item"><i className="uil uil-usd-circle icon__1"></i>My Wallet</Dropdown.Item>								
-                        <Dropdown.Item href="/address" className="item channel_item"><i className="uil uil-location-point icon__1"></i>My Address</Dropdown.Item>								
-                        <Dropdown.Item href="/offers" className="item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
-                        <Dropdown.Item href="/faq" className="item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								
+                    <Dropdown.Menu  variant="">
+                        <Dropdown.Item href="/dashboard" className="btn btn-light item channel_item" variant=""><i className="uil uil-apps icon__1"></i>Dashbaord</Dropdown.Item>								
+                        <Dropdown.Item href="/orders" className="btn btn-light item channel_item"><i className="uil uil-box icon__1"></i>My Orders</Dropdown.Item>								
+                        <Dropdown.Item href="/wishlist" className="btn btn-light item channel_item"><i className="uil uil-heart icon__1"></i>My Wishlist</Dropdown.Item>								
+                        <Dropdown.Item href="/wallet" className="btn btn-light item channel_item"><i className="uil uil-usd-circle icon__1"></i>My Wallet</Dropdown.Item>								
+                        <Dropdown.Item href="/address" className="btn btn-light item channel_item"><i className="uil uil-location-point icon__1"></i>My Address</Dropdown.Item>								
+                        <Dropdown.Item href="/offers" className="btn btn-light item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
+                        <Dropdown.Item href="/faq" className="btn btn-light item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								
                         <Logout/>
                     </Dropdown.Menu>
                 </Dropdown>
@@ -106,12 +109,17 @@ function LocationDropDownItem({warehouse}){
 
 
 function Navbar(){
-    
+
+    //Category Modal 
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const handleCategoryModalClose = () => setShowCategoryModal(false)
+    const handleCategoryModalShow = () => setShowCategoryModal(true);
+
     const dispatch = useDispatch();
     const {user, isAuthenticated} = useSelector((store)=>store.user)
     const selectedWarehouse= useSelector((store)=>store.selectedWarehouse)
     const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
-
+    const {cartItems, isCartLoading} = useSelector((state)=>state.cart)
 
 
     //get authenticated user if any
@@ -133,8 +141,9 @@ function Navbar(){
     return (
         <>
             {/* Category Model */}
-            <CategoryModel/>
-            
+            <Modal show={showCategoryModal} onHide={handleCategoryModalClose}>
+                <CategoryModel showCategoryModal={showCategoryModal} setShowCategoryModal={setShowCategoryModal}/>
+            </Modal>
             {/* Search Model*/}
             <SearchModel/>
 	
@@ -155,8 +164,8 @@ function Navbar(){
                             <Link to="/" ><img className="logo-inverse" src={darkLogo} alt=""/></Link>
                         </div>
 
-                        <Dropdown  id="dropdown-basic" className="select_location">
-                            <Dropdown.Toggle className="ui inline dropdown loc-title">
+                        <Dropdown  id="dropdown-basic" className="select_location" >
+                            <Dropdown.Toggle className="ui inline dropdown loc-title" variant="">
                                 <div className="text" >
                                     <i className="uil uil-location-point"></i>
                                         {!selectedWarehouse.isLoading && selectedWarehouse.warehouse.warehouse.name}
@@ -175,8 +184,10 @@ function Navbar(){
                             <div className="ui search">
                             <div className="ui left icon input swdh10">
                                 <input className="prompt srch10" type="text" placeholder="Search for products.."/>
-                                <i className='uil uil-search-alt icon icon1'></i>
+                                
+                                <Link to="/product-search" className="btn btn-light" ><i className='uil uil-search-alt icon icon1'></i>  </Link>
                             </div>
+                                
                             </div>
                         </div>
                         <div className="header_right">
@@ -201,15 +212,18 @@ function Navbar(){
                 <div className="sub-header-group">
                     <div className="sub-header">
                         <div className="ui dropdown">
-                            <Link to="#" className="category_drop hover-btn" data-toggle="modal" data-target="#category_model" title="Categories"><i className="uil uil-apps"></i><span className="cate__icon">Select Category</span></Link>
+                            {/* <Link to="#" className="category_drop hover-btn" data-toggle="modal" data-target="#category_model" title="Categories"><i className="uil uil-apps"></i><span className="cate__icon">Select Category</span></Link> */}
+                            <Button onClick={handleCategoryModalShow} className="category_drop hover-btn btn-light" ><i className="uil uil-apps"></i><span className="cate__icon">Select Category</span></Button>
                         </div>
                         <nav className="navbar navbar-expand-lg navbar-light py-3">
                             <div className="container-fluid">
                                 <button className="navbar-toggler menu_toggle_btn" type="button" data-target="#navbarSupportedContent"><i className="uil uil-bars"></i></button>
                                 <div className="collapse navbar-collapse d-flex flex-column flex-lg-row flex-xl-row justify-content-lg-end bg-dark1 p-3 p-lg-0 mt1-5 mt-lg-0 mobileMenu" id="navbarSupportedContent">
                                     <ul className="navbar-nav main_nav align-self-stretch">
-                                        <li className="nav-item"><Link to="/" className="nav-link active" title="Home">Home</Link></li>
-                                        <li className="nav-item"><Link to="/new-products" className="nav-link new_item" title="New Products">New Products</Link></li>
+                                        {window.location.pathname==="/"  &&<li className="nav-item"><Link to="/" className="nav-link active" title="Home">Home</Link></li>}
+                                        {window.location.pathname!=="/"  &&<li className="nav-item"><Link to="/" className="nav-link" title="Home">Home</Link></li>}
+                                        {window.location.pathname==="/new-products" &&  <li className="nav-item"><Link to="/new-products" className="nav-link active" title="New Products">New Products</Link></li>}
+                                        {window.location.pathname!=="/new-products" &&  <li className="nav-item"><Link to="/new-products" className="nav-link new_item" title="New Products">New Products</Link></li>}
                                         <li className="nav-item"><Link to="shop_grid.html" className="nav-link" title="Featured Products">Featured Products</Link></li>
                                         {/* <li className="nav-item"> */}
 
@@ -254,7 +268,7 @@ function Navbar(){
                             <Link to="#" className="cate__btn" data-toggle="modal" data-target="#category_model" title="Categories"><i className="uil uil-apps"></i></Link>
                         </div>
                         <div className="header_cart order-1">
-                            <Link to="#" className="cart__btn hover-btn pull-bs-canvas-left" title="Cart"><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>2</ins><i className="uil uil-angle-down"></i></Link>
+                            {<Link to="#" className="cart__btn hover-btn pull-bs-canvas-left" title="Cart"><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Link>}
                         </div>
                         <div className="search__icon order-1">
                             <Link to="#" className="search__btn hover-btn" data-toggle="modal" data-target="#search_model" title="Search"><i className="uil uil-search"></i></Link>

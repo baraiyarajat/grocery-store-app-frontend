@@ -5,6 +5,8 @@ import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import {PencilIcon, TrashIcon} from '@primer/octicons-react'
+
 //Includes
 import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
@@ -76,8 +78,8 @@ function AddressItem({address, showModal,  setShow, setAddressObject}){
                     <p>{address.address_line_1}, {address.address_line_2}, {city}, {address.pincode} </p>
                     <ul className="action-btns">
                         
-                        <li><button  className="action-btn" onClick={()=>handleEditAddress()} ><i className="uil uil-edit"></i></button></li>
-                        <li><button type="button"  onClick={()=>handleDeleteAddress(address.id)} className="action-btn"><i className="uil uil-trash-alt"></i></button></li>
+                        <li><button className="btn" onClick={()=>handleEditAddress()} ><PencilIcon size={18} /></button></li>
+                        <li><button className="btn" onClick={()=>handleDeleteAddress(address.id)} ><TrashIcon size={18} /></button></li>
                         
                     </ul>
                 </div>
@@ -96,8 +98,7 @@ function Address(){
 
     const [showModal, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    
 
 
     const initialAddressObject = {address_type:'Home',
@@ -105,10 +106,19 @@ function Address(){
                                     address_line_2:'',
                                     pincode:'',
                                     city:'',
-                                    address_id:''}
+                                    address_id:null}
 
     const [addressObject, setAddressObject] = useState(initialAddressObject)
                               
+
+    const handleClose = () => {
+        
+        setAddressObject(initialAddressObject)
+        return setShow(false)
+    
+    };
+    const handleShow = () => setShow(true);
+
     const handleAddressFormChange = (e) =>{
         const name = e.target.name;
         const value = e.target.value;
@@ -134,15 +144,12 @@ function Address(){
                                 "address_id":addressObject.address_id}
 
 
-        if(addressObject.id!==''){
-            console.log("Update")
-            
+        if(addressFormData["address_id"] != null){            
             axios.patch('http://127.0.0.1:8000/api/v0/addresses/edit-address', addressFormData).then((response) => {
             dispatch(getAddresses())
-
             setAddressObject(initialAddressObject)
             setShow(false)
-
+            
             navigate('/address')
         })
         .catch(error => {
@@ -150,8 +157,6 @@ function Address(){
             setShow(false)
 
         });
-
-
         }else{
             
             axios.post('http://127.0.0.1:8000/api/v0/addresses/add-address', addressFormData)
@@ -246,7 +251,7 @@ function Address(){
                                                         <h4>My Address</h4>
                                                     </div>
                                                     <div className="address-body">
-                                                        <Button onClick={handleShow} className="add-address hover-btn" >Add New Address</Button>
+                                                        <Button onClick={handleShow} className=" add-address btn btn-secondary hover-btn" >Add New Address</Button>
                                                         <Modal show={showModal} onHide={handleClose}>
                                                             <div id="address_model" className="header-cate-model" tabIndex="-1" role="dialog" aria-modal="false">
                                                                 <div className="category-area-inner">

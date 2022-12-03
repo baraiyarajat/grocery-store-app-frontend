@@ -4,13 +4,14 @@ import Footer from "../includes/Footer";
 import { Link } from "react-router-dom";
 import { getCategoryBySlug } from "../../store/category/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useDebugValue, useEffect } from "react";
+import { useEffect } from "react";
 import { getWarehouseProductsByCategory, sortProducts } from "../../store/productsByCategory/productsByCategorySlice";
 import { addWishlistProduct, getWishlist, deleteWishlistProduct } from "../../store/wishlist/wishlistSlice";
 
 import { DropdownButton } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
 import { setProductsByCategorySortOption } from "../../store/productsByCategory/productsByCategorySortSlice";
+import { addCartItem, deleteCartItem, getCartItems } from "../../store/cart/cartSlice";
 
 function ProductItem(params){
 
@@ -26,8 +27,26 @@ function ProductItem(params){
     const deleteFromWishlistHandler =  (e) =>{
         e.preventDefault()
         dispatch(deleteWishlistProduct(params.wishlistProduct.id))
+    }   
+
+    const deleteFromCartHandler =async (e) =>{
+        e.preventDefault()
+        await Promise.all([
+            dispatch(deleteCartItem(params.cartProduct.id))
+        ]);
+        return dispatch(getCartItems());
     }
 
+
+    const addToCartHandler = async(e) =>{
+        e.preventDefault()
+        
+        await Promise.all([
+            dispatch(addCartItem(params.product.id))
+        ]);
+        return dispatch(getCartItems());
+
+    }
 
     const imageUrl = `http://127.0.0.1:8000${params.product.product.image}`
 
@@ -36,7 +55,7 @@ function ProductItem(params){
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
                 <Link to={`/products/${params.product.product.slug}`} className="product-img">
-                    <img src={imageUrl} alt=""/>
+                    <img src={imageUrl} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
                         { params.product.discount_rate!==0 && <span className="offer-badge-1">{params.product.discount_rate}% off</span>}
@@ -53,14 +72,17 @@ function ProductItem(params){
                     <Link to={`/products/${params.product.product.slug}`}><h4>{params.product.product.name}</h4></Link>
                     { params.product.discount_rate!==0 &&  <div className="product-price">${params.product.get_discounted_price} <span>${params.product.price}</span></div>}
                     { params.product.discount_rate===0 &&  <div className="product-price">${params.product.price} </div>}
-                    <div className="qty-cart">
+                    {!params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light hover-btn" type="button" onClick={(e)=>addToCartHandler(e)}>Add to Cart</button>}
+                    {params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light hover-btn" type="button" onClick={(e)=>deleteFromCartHandler(e)} >Remove from Cart</button>}
+                    {params.product.stock===0 &&  <button className="btn btn-light disabled"  disabled={true} type="button">Add to Cart</button>}
+                    {/* <div className="qty-cart">
                         <div className="quantity buttons_added">
-                            {/* <input type="button" value="-" className="minus minus-btn"/>
+                            <input type="button" value="-" className="minus minus-btn"/>
                             <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                            <input type="button" value="+" className="plus plus-btn"/> */}
+                            <input type="button" value="+" className="plus plus-btn"/>
                         </div>
                         <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
@@ -79,7 +101,7 @@ function ProductsByCategory(){
     const {products,isProductsLoading} = useSelector((store)=>store.productsByCategory)
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
     const {sortOption, isSortOptionLoading}  = useSelector((store)=>store.productsByCategorySort)
-
+    const {cartItems, isCartLoading} = useSelector((store)=>store.cart)
 
     useEffect(()=>{
         dispatch(getCategoryBySlug(categorySlug))
@@ -93,6 +115,11 @@ function ProductsByCategory(){
 
     useEffect(()=>{
         dispatch(getWishlist())
+    },[warehouse, category, dispatch])
+
+
+    useEffect(()=>{
+        dispatch(getCartItems())
     },[warehouse, category, dispatch])
 
     
@@ -113,7 +140,7 @@ function ProductsByCategory(){
 
     useEffect(()=>{
         dispatch(sortProducts(sortOption))
-    },[products])
+    },[products, dispatch])
 
 
     return (
@@ -156,7 +183,7 @@ function ProductsByCategory(){
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                { !isLoading && !isProductsLoading && !isWishlistLoading  && <div className="row">
+                                { !isLoading && !isProductsLoading && !isWishlistLoading  && !isCartLoading && <div className="row">
                                     {products.map((product)=>{ 
                                         
                                         const productId = product.id
@@ -164,8 +191,15 @@ function ProductsByCategory(){
                                             return wishlistProduct.warehouse_product.id === productId 
                                         })[0]
                                         const inWishlist = wishlistProduct && true
+
+                                        const cartProduct = cartItems.filter((item)=>{
+                                            return item.warehouse_product.id === productId
+                                        })[0]
+
+                                        const inCart = cartProduct && true
+
                                         
-                                        return <ProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist}/>})}
+                                        return <ProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist} cartProduct={cartProduct} inCart ={inCart}  />})}
                                 </div>}
                             </div>
                         </div>

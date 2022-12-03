@@ -1,62 +1,67 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import ReactDOM from 'react-dom';
 import { useSelector } from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, Navigate, useNavigate} from 'react-router-dom';
 
 
 function CategoryItem(params){
     const category = params.category
     const imageUrl = `http://127.0.0.1:8000${category.image}`
+    const navigate = useNavigate();
+    const handleModalClick = (e) =>{
+        e.preventDefault()
+        params.setShowCategoryModal(false)
+        navigate(`/products-by-category/${category.slug}`)
+    }
+
     return(
             <li>
-                <Link to={`/products-by-category/${category.slug}`} className="single-cat-item">
-                    {/* <a href={`/products-by-category/${category.slug}`} className="single-cat-item"> */}
+                <Link  onClick={(e)=>handleModalClick(e)} className="single-cat-item">
                     <div className="icon">
                         <img src={imageUrl} alt="category_image"/>
                     </div>
                     <div className="text"> {category.name} </div>
                 </Link>
-                {/* </a> */}
+                
             </li>
         )
 }
 
 
-function CategoryModel(){
+function CategoryModel( {showCategoryModal , setShowCategoryModal} ){
 
     const {categories, isCategoriesLoading} = useSelector((store)=>store.categories)
 
+    const handleCategoryModalClose = (e) =>{
+        e.preventDefault();
+        setShowCategoryModal(false)
+    }
+
     return (
         <>
-            <div id="category_model" className="header-cate-model main-gambo-model modal fade" tabIndex="-1" role="dialog" aria-modal="false">
-                <div className="modal-dialog category-area" role="document">
+            <div id="category_model" className="header-cate-model" tabIndex="-1" role="dialog" aria-modal="false">
                     <div className="category-area-inner">
-                        <div className="modal-header">
-                            <button type="button" className="close btn-close" data-dismiss="modal" aria-label="Close">
-                                <i className="uil uil-multiply"></i>
-                            </button>
-                        </div>
                         <div className="category-model-content modal-content"> 
-                            <div className="cate-header">
-                                <h4>Select Category</h4>
-                            </div>
+                            
+                                <div className="cate-header">
+                                    <h4>Select Category</h4>
+                                    <Button className="btn btn-light" onClick={(e)=>handleCategoryModalClose(e)}>Close</Button>
+                                </div>
+                            
                             <ul className="category-by-cat">
                                  {! isCategoriesLoading && 
                                         
                                         categories.map((category) =>{
-                                            return <CategoryItem key={category.id} category={category}/>
+                                            return <CategoryItem key={category.id} category={category} setShowCategoryModal={setShowCategoryModal}/>
                                         })
                                         
                                     }
                             </ul>
-                            {/* <Link to="/category/some-category" className="morecate-btn"><i className="uil uil-apps"></i>More Categories</Link> */}
+                            
                         </div>
                     </div>
-                </div>
             </div>
-
-
-
         </>
     )
 

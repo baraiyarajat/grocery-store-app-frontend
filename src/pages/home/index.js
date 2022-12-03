@@ -54,9 +54,12 @@ function ProductItem({product, wishlistProduct, inWishlist}){
     }
 
 
-    const deleteFromWishlistHandler =  (e) =>{
+    const deleteFromWishlistHandler = async (e) =>{
         e.preventDefault()
-        dispatch(deleteWishlistProduct(wishlistProduct.id))
+        await Promise.all([
+            dispatch(deleteWishlistProduct(wishlistProduct.id))
+        ]);
+        return dispatch(getWishlist());
     }
 
 
@@ -67,7 +70,7 @@ function ProductItem({product, wishlistProduct, inWishlist}){
             <div className="item">
                 <div className="product-item">
                     <Link to={`/products/${product.product.slug}`} className="product-img">
-                        <img src={imageUrl} alt="product_image"/>
+                        <img src={imageUrl} width="300" height="300" alt="product_image"/>
                         <div className="product-absolute-options">
                             <span className="offer-badge-1">New</span>
                             {!inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}

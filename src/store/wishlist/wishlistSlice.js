@@ -32,7 +32,7 @@ export const deleteWishlistProduct = createAsyncThunk(
         try{
             
             const deleteWishlistProductUrl = wishlistUrl.concat(wishlist_product_id)
-            const resp = axios.delete(deleteWishlistProductUrl)
+            const resp = await axios.delete(deleteWishlistProductUrl)
             return (await resp).data
         }catch{
             return thunkAPI.rejectWithValue("Not able to delete wishlist product")
@@ -47,7 +47,7 @@ export const addWishlistProduct = createAsyncThunk(
     async(warehouse_product_id,thunkAPI) =>{
         try{
             const userId = thunkAPI.getState().user.user.id
-            const resp = axios.put(addProductToWishlistUrl, {'user_id':userId, 'warehouse_product_id':warehouse_product_id})
+            const resp = await axios.put(addProductToWishlistUrl, {'user_id':userId, 'warehouse_product_id':warehouse_product_id})
             return (await resp).data
         }catch{
             return thunkAPI.rejectWithValue("Not able to add wishlist product")
@@ -73,7 +73,7 @@ const wishlistSlice = createSlice({
         }).addCase(deleteWishlistProduct.fulfilled, (state,action)=>{
             state.isWishlistLoading = false
             state.wishlistProducts =  state.wishlistProducts.filter((wishlistProduct)=>{ return wishlistProduct.id !==action.payload.wishlist_product_id})
-            console.log("Wishlist Product deleted")
+            
 
         }).addCase(deleteWishlistProduct.rejected, (state)=>{
             state.isWishlistLoading = false
@@ -90,7 +90,7 @@ const wishlistSlice = createSlice({
                 state.wishlistProducts.push(action.payload)
             }
             
-            console.log("Wishlist Product Added")
+            
 
         }).addCase(addWishlistProduct.rejected,(state)=>{
             state.isWishlistLoading = false
