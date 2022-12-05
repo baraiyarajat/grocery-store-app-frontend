@@ -287,7 +287,7 @@ function Navbar(){
                         <div className="header_cart order-1">
                             {/* {<Link to="#" className="cart__btn hover-btn pull-bs-canvas-left" title="Cart"><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Link>} */}
                             {/* <Button onClick={handleCartModalShow} className="cart__btn hover-btn pull-bs-canvas-left" ><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Button> */}
-                            {!isCartLoading &&  <Button onClick={handleCartModalShow} className="cart__btn hover-btn btn btn-secondary" ><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Button>}
+                            { <Button onClick={handleCartModalShow} className="cart__btn hover-btn btn btn-secondary" ><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Button>}
                         </div>
                         <div className="search__icon order-1">
                             <Link to="#" className="search__btn hover-btn" data-toggle="modal" data-target="#search_model" title="Search"><i className="uil uil-search"></i></Link>

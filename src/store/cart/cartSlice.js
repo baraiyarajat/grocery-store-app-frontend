@@ -4,7 +4,13 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
 const initialCartState = {
     cartItems : [],
-    isCartLoading : true
+    isCartLoading : true,
+    cartTotal:0,
+    deliveryCharge:3,
+    savings:0,
+    finalCartTotal:0,
+    promoCodeApplied:false,
+    promoCode:{}
 }
 
 const cartUrl = "http://127.0.0.1:8000/api/v0/cart/"
@@ -84,7 +90,17 @@ export const decreaseCartItemQuantity = createAsyncThunk(
 const cartSlice = createSlice({
     name:'cart',
     initialState:initialCartState,
-    reducers:{},
+    reducers:{
+        setCartTotal:(state,action)=>{
+            state.cartTotal = Math.round(state.cartItems.reduce((partialSum,a)=>partialSum+a.warehouse_product.get_discounted_price * a.quantity,0)*100 )/100
+        },
+        setSavings: (state,action)=>{
+            state.savings = Math.round(state.cartItems.reduce((partialSum,a)=>partialSum+a.warehouse_product.price* a.quantity-a.warehouse_product.get_discounted_price* a.quantity,0) * 100) /100 
+        },
+        setFinalCartTotal: (state,action)=>{
+            state.finalCartTotal = state.cartTotal + state.deliveryCharge 
+        }
+    },
     extraReducers:(builder)=>{
         builder.addCase(getCartItems.pending,(state)=>{
             state.isCartLoading = true
@@ -139,5 +155,5 @@ const cartSlice = createSlice({
 
 })
 
-
+export const {setCartTotal, setSavings, setFinalCartTotal} = cartSlice.actions;
 export default cartSlice.reducer;

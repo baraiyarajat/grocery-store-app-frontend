@@ -2,7 +2,7 @@ import { Modal, Button } from "react-bootstrap";
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
-import { decreaseCartItemQuantity, deleteCartItem, getCartItems, increaseCartItemQuantity } from '../../../store/cart/cartSlice';
+import { decreaseCartItemQuantity, deleteCartItem, getCartItems, increaseCartItemQuantity, setCartTotal, setFinalCartTotal, setSavings } from '../../../store/cart/cartSlice';
 import {DashIcon, PlusIcon} from '@primer/octicons-react'
 
 
@@ -79,14 +79,8 @@ function CartItem({cartProduct, setShowCartModal}){
 }
 
 function CartSidebar({showCartModal, setShowCartModal}){
-
-
-    const [cartTotal,setCartTotal] = useState(0)
-    const [deliveryCharge, setDeliveryCharge] = useState(3)
-    const [discount, setDiscount] = useState(0)
-    const [finalCartTotal, setFinalCartTotal] = useState(0)
-    
-    const {cartItems, isCartLoading} = useSelector((store)=>store.cart)
+ 
+    const {cartItems, isCartLoading, cartTotal, savings, finalCartTotal, deliveryCharge} = useSelector((store)=>store.cart)
     const {warehouse, isLoading} = useSelector((store)=>store.selectedWarehouse)
 
     const dispatch = useDispatch()
@@ -96,23 +90,21 @@ function CartSidebar({showCartModal, setShowCartModal}){
     },[dispatch,warehouse])
 
     useEffect(()=>{
-        setCartTotal( Math.round(cartItems.reduce((partialSum,a)=>partialSum+a.warehouse_product.get_discounted_price * a.quantity,0)*100 )/100)
-        setDiscount(Math.round(cartItems.reduce((partialSum,a)=>partialSum+a.warehouse_product.price* a.quantity-a.warehouse_product.get_discounted_price* a.quantity,0) * 100) /100 )
-        
+        dispatch(setSavings())
+        dispatch(setCartTotal())
     },[cartItems, dispatch])
 
 
     useEffect(()=>{
-        const finalCartTotal = cartTotal + deliveryCharge 
-        setFinalCartTotal(finalCartTotal)
+        dispatch(setFinalCartTotal())
     },[cartTotal, dispatch, deliveryCharge])
 
+    
     const navigate = useNavigate()
     const handleCheckout = (e) =>{
         e.preventDefault()
         setShowCartModal(false)
         navigate('/checkout')
-
     }
 
 
@@ -149,7 +141,7 @@ function CartSidebar({showCartModal, setShowCartModal}){
             <Modal.Title id="cart-modal-footer">
                 <div class="cart-total-dil saving-total ">
                     <h4>Total Saving</h4>
-                    <span>${discount}</span>
+                    <span>${savings}</span>
                 </div>
 
                 <div class="main-total-cart">
