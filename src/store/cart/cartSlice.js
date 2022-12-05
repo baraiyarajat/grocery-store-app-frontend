@@ -81,8 +81,6 @@ export const decreaseCartItemQuantity = createAsyncThunk(
     }
 )
 
-
-
 const cartSlice = createSlice({
     name:'cart',
     initialState:initialCartState,
@@ -134,7 +132,6 @@ const cartSlice = createSlice({
             state.isCartLoading = true
         }).addCase(addCartItem.fulfilled,(state,action)=>{
             state.isCartLoading = false
-
         }).addCase(addCartItem.rejected,(state)=>{
             state.isCartLoading = false
         })

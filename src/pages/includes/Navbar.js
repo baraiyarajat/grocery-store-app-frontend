@@ -23,6 +23,7 @@ import { getWishlist } from "../../store/wishlist/wishlistSlice";
 
 
 import { Modal, Button } from "react-bootstrap";
+import { getCartItems } from "../../store/cart/cartSlice";
 
 
 function GuestUserItems(){
@@ -115,6 +116,11 @@ function Navbar(){
     const handleCategoryModalClose = () => setShowCategoryModal(false)
     const handleCategoryModalShow = () => setShowCategoryModal(true);
 
+    //Cart Modal
+    const [showCartModal, setShowCartModal] = useState(false)
+    const handleCartModalClose = () => setShowCartModal(false)
+    const handleCartModalShow = () => setShowCartModal(true);
+
     const dispatch = useDispatch();
     const {user, isAuthenticated} = useSelector((store)=>store.user)
     const selectedWarehouse= useSelector((store)=>store.selectedWarehouse)
@@ -137,6 +143,12 @@ function Navbar(){
         dispatch(getSelectedWarehouse())
     },[dispatch])
 
+    useEffect(()=>{
+        dispatch(getCartItems())
+    },[selectedWarehouse,dispatch])
+
+
+
 
     return (
         <>
@@ -149,8 +161,13 @@ function Navbar(){
 	
 
            {/* Cart Sidebar Offset */}
-            <CartSidebar/>
-	
+           <Modal  dialogClassName="modal-90w" id="cart-modal" scrollable={true} show={showCartModal} onHide={handleCartModalClose}>
+                {/* <CartSidebarUpdated showCartModal={showCartModal} setShowCartModal={setShowCartModal} /> */}
+                <CartSidebar showCartModal={showCartModal} setShowCartModal={setShowCartModal} />
+            </Modal>
+
+            
+
 
              {/* Header */}
             <header className="header clearfix">
@@ -268,7 +285,9 @@ function Navbar(){
                             <Link to="#" className="cate__btn" data-toggle="modal" data-target="#category_model" title="Categories"><i className="uil uil-apps"></i></Link>
                         </div>
                         <div className="header_cart order-1">
-                            {<Link to="#" className="cart__btn hover-btn pull-bs-canvas-left" title="Cart"><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Link>}
+                            {/* {<Link to="#" className="cart__btn hover-btn pull-bs-canvas-left" title="Cart"><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Link>} */}
+                            {/* <Button onClick={handleCartModalShow} className="cart__btn hover-btn pull-bs-canvas-left" ><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Button> */}
+                            {!isCartLoading &&  <Button onClick={handleCartModalShow} className="cart__btn hover-btn btn btn-secondary" ><i className="uil uil-shopping-cart-alt"></i><span>Cart</span><ins>{cartItems.reduce((partialSum,item)=>partialSum + item.quantity,0)}</ins><i className="uil uil-angle-down"></i></Button>}
                         </div>
                         <div className="search__icon order-1">
                             <Link to="#" className="search__btn hover-btn" data-toggle="modal" data-target="#search_model" title="Search"><i className="uil uil-search"></i></Link>

@@ -546,7 +546,7 @@ function Home(){
                             </div>
                             <div className="col-md-12">
                                 <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    {!isNewProductsLoading &&  !isWishlistLoading && !isLoading && newProducts.map((product)=>{
+                                    {!isNewProductsLoading &&  !isWishlistLoading && !isLoading && newProducts.slice(0,9).map((product)=>{
 
                                         const productId = product.id
                                         const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{

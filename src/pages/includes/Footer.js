@@ -13,6 +13,7 @@ import pyicon6 from '../../assets/images/footer-icons/pyicon-6.svg'
 import download1 from '../../assets/images/download-1.svg'   
 import download2 from '../../assets/images/download-2.svg'   
 import { useDispatch } from "react-redux";
+import { getCategories } from "../../store/category/categoriesSlice";
 
 
 function Footer(){
@@ -21,6 +22,10 @@ function Footer(){
     const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
     const {categories, isCategoriesLoading} = useSelector((store)=>store.categories)
     
+    useEffect(()=>{
+        dispatch(getCategories())
+    },[dispatch])
+
     useEffect(()=>{
         dispatch(getWarehouses())
     },[dispatch])

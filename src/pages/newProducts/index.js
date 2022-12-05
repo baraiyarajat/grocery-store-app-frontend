@@ -71,9 +71,9 @@ function NewProductItem(params){
                     <Link to={`/products/${params.product.product.slug}`}><h4>{params.product.product.name}</h4></Link>
                     { params.product.discount_rate!==0 &&  <div className="product-price">${params.product.get_discounted_price} <span>${params.product.price}</span></div>}
                     { params.product.discount_rate===0 &&  <div className="product-price">${params.product.price} </div>}
-                    {!params.inCart &&  params.product.stock>0 &&  <button className="btn btn-primary" type="button" onClick={(e)=>addToCartHandler(e)}>Add to Cart</button>}
-                    {params.inCart &&  params.product.stock>0 &&  <button className="btn btn-primary" type="button" onClick={(e)=>deleteFromCartHandler(e)} >Remove from Cart</button>}
-                    {params.product.stock===0 &&  <button className="btn btn-primary disabled"  disabled={true} type="button">Add to Cart</button>}
+                    {!params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light" type="button" onClick={(e)=>addToCartHandler(e)}>Add to Cart</button>}
+                    {params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light" type="button" onClick={(e)=>deleteFromCartHandler(e)} >Remove from Cart</button>}
+                    {params.product.stock===0 &&  <button className="btn btn-light disabled"  disabled={true} type="button">Add to Cart</button>}
                     
                 </div>
             </div>
@@ -138,7 +138,7 @@ function NewProducts(){
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                {!isNewProductsLoading && !isWishlistLoading && !isCartLoading  && <div className="row">
+                                {!isNewProductsLoading && !isWishlistLoading  && <div className="row">
                                     {newProducts.map((product)=>{ 
                                         
                                         const productId = product.id

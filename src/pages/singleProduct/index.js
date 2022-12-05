@@ -19,7 +19,7 @@ function SingleProduct (){
 
     useEffect(()=>{
         dispatch(getSingleProduct(productSlug))
-    },[warehouse])
+    },[warehouse, productSlug])
 
 
     const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{

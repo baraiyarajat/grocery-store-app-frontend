@@ -1,13 +1,15 @@
+import { Modal, Button } from "react-bootstrap";
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { decreaseCartItemQuantity, deleteCartItem, getCartItems, increaseCartItemQuantity } from '../../../store/cart/cartSlice';
 import {DashIcon, PlusIcon} from '@primer/octicons-react'
 
-import { getSelectedWarehouse } from '../../../store/warehouse/selectedWarehouseSlice';
 
-function CartItem({cartProduct}){
+
+
+
+function CartItem({cartProduct, setShowCartModal}){
 
     const imageUrl = `http://127.0.0.1:8000${cartProduct.warehouse_product.product.image}`
 
@@ -39,14 +41,25 @@ function CartItem({cartProduct}){
         return dispatch(getCartItems())   
     }
 
+    const navigate = useNavigate()
+
+    const handleProductNavigate = (e) =>{
+        e.preventDefault()
+        setShowCartModal(false)
+        navigate(`/products/${cartProduct.warehouse_product.product.slug}`)
+    }
+
     return(
         <div className="cart-item">
-            <div className="cart-product-img">
-                <img src={imageUrl} alt="product_image"/>
-                {cartProduct.warehouse_product.discount_rate>0   && <div className="offer-badge">{cartProduct.warehouse_product.discount_rate}% OFF</div>}
-            </div>
+            <Link onClick={(e)=>handleProductNavigate(e)} >
+                <div className="cart-product-img">
+                    <img src={imageUrl} alt="product_image"/>
+                    {cartProduct.warehouse_product.discount_rate>0   && <div className="offer-badge">{cartProduct.warehouse_product.discount_rate}% OFF</div>}
+                </div>
+            </Link>
             <div className="cart-text">
-                <h4>{cartProduct.warehouse_product.product.name}</h4>
+                <Link><h4 onClick={(e)=>handleProductNavigate(e)}>{cartProduct.warehouse_product.product.name}</h4></Link>
+                
                 
                 {cartProduct.warehouse_product.stock>0 &&  <div className="qty-group">
                     <div className="quantity buttons_added">
@@ -54,8 +67,8 @@ function CartItem({cartProduct}){
                         &nbsp;{cartProduct.quantity}&nbsp;
                         <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleIncreaseItemQuantity(e)}><PlusIcon size={10} /></button>
                     </div>
-                    {cartProduct.warehouse_product.discount_rate>0 &&  <div className="cart-item-price">${cartProduct.warehouse_product.get_discounted_price * cartProduct.quantity}<span>${cartProduct.warehouse_product.price * cartProduct.quantity}</span></div>}
-                    {cartProduct.warehouse_product.discount_rate===0 &&  <div className="cart-item-price">${cartProduct.warehouse_product.price * cartProduct.quantity}</div>}
+                    {cartProduct.warehouse_product.discount_rate>0 &&  <div className="cart-item-price">${Math.round((cartProduct.warehouse_product.get_discounted_price * cartProduct.quantity)*100)/100}<span>${cartProduct.warehouse_product.price * cartProduct.quantity}</span></div>}
+                    {cartProduct.warehouse_product.discount_rate===0 &&  <div className="cart-item-price">${Math.round((cartProduct.warehouse_product.price * cartProduct.quantity)*100)/100}</div>}
                 </div>}
 
                 {cartProduct.warehouse_product.stock==0 && <div> Out of stock  </div>}	
@@ -65,8 +78,8 @@ function CartItem({cartProduct}){
     )
 }
 
+function CartSidebar({showCartModal, setShowCartModal}){
 
-function CartSidebar(){
 
     const [cartTotal,setCartTotal] = useState(0)
     const [deliveryCharge, setDeliveryCharge] = useState(3)
@@ -92,53 +105,65 @@ function CartSidebar(){
     useEffect(()=>{
         const finalCartTotal = cartTotal + deliveryCharge 
         setFinalCartTotal(finalCartTotal)
-    },[cartTotal, dispatch])
+    },[cartTotal, dispatch, deliveryCharge])
+
+    const navigate = useNavigate()
+    const handleCheckout = (e) =>{
+        e.preventDefault()
+        setShowCartModal(false)
+        navigate('/checkout')
+
+    }
 
 
     return(
         <>
-            <div className="bs-canvas bs-canvas-left position-fixed bg-cart h-100">
-                <div className="bs-canvas-header side-cart-header p-3 ">
-                    <div className="d-inline-block  main-cart-title">My Cart <span>({cartItems.reduce((partialSum,item)=>partialSum+ item.quantity,0)} Items)</span></div>
-                    <button type="button" className="bs-canvas-close close" aria-label="Close"><i className="uil uil-multiply"></i></button>
-                </div> 
+            <Modal.Header id="cart-modal-header" >
+                    <Modal.Title id="cart-modal-title">
+                        My Cart <span id='cart-modal-title-item-count'>({cartItems.reduce((partialSum,item)=>partialSum+ item.quantity,0)} Items)</span>
+                    </Modal.Title>
+                    <Button id='cart-close-button' onClick={()=>setShowCartModal(false)} ><i id="cart-close-button-icon" className="uil uil-multiply"></i></Button>
+            </Modal.Header>
 
-                <div className="bs-canvas-body">
-                    <div className="cart-top-total">
-                        <div className="cart-total-dil">
-                            <h4>Gambo Super Market</h4>
-                            <span>${cartTotal}</span>
-                        </div>
-                        <div className="cart-total-dil pt-2">
-                            <h4>Delivery Charges</h4>
-                            <span>$3</span>
-                        </div>
+            <Modal.Title>
+                <div class="cart-top-total" id="cart-modal-body-top">
+                    <div class="cart-total-dil">
+                        <h4>Gambo Super Market</h4>
+                        <span>${cartTotal}</span>
                     </div>
-                        <div className="side-cart-items">
-                            {!isCartLoading && cartItems.map((item)=>{
-                                return <CartItem key={item.id} cartProduct={item} />
-                            })}
-                        </div>
-                </div>
-
-                <div className="bs-canvas-footer">
-                    <div className="cart-total-dil saving-total ">
-                        <h4>Total Saving</h4>
-                        <span>${discount}</span>
-                    </div>
-                    <div className="main-total-cart">
-                        <h2>Total</h2>
-                        <span>${finalCartTotal}</span>
-                    </div>
-                    <div className="checkout-cart">
-                        <Link to="/apply-promo" className="promo-code">Have a promocode?</Link>
-                        <Link to="/checkout" className="cart-checkout-btn hover-btn">Proceed to Checkout</Link>
+                    <div class="cart-total-dil pt-2">
+                        <h4>Delivery Charges</h4>
+                        <span>$3</span>
                     </div>
                 </div>
-            </div>
-        </>
+            </Modal.Title>
+
+            <Modal.Body id="cart-modal-body">  
+                <div class="side-cart-items">
+                    {!isCartLoading && cartItems.map((item)=>{
+                        return <CartItem key={item.id} cartProduct={item} setShowCartModal={setShowCartModal} />
+                    })}
+                </div>
+            </Modal.Body>
+        
+            <Modal.Title id="cart-modal-footer">
+                <div class="cart-total-dil saving-total ">
+                    <h4>Total Saving</h4>
+                    <span>${discount}</span>
+                </div>
+
+                <div class="main-total-cart">
+                    <h2>Total</h2>
+                    <span>${finalCartTotal}</span>
+                </div>
+
+                <div class="checkout-cart">
+                    <Link to="/" class="promo-code">Have a promocode?</Link>
+                    <Button onClick={(e)=>handleCheckout(e)} className="cart-checkout-btn hover-btn btn-secondary" >Proceed to Checkout</Button>
+                </div>
+            </Modal.Title>
+        </>   
     )
-
 }
 
 

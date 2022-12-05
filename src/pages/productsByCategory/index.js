@@ -172,7 +172,7 @@ function ProductsByCategory(){
                                             <h2>{category.name}</h2>
                                         </div>
 
-                                        {!isSortOptionLoading && <DropdownButton className="product-sort" title={sortOptionsDict[sortOption]} onSelect={handleSortOptions}>
+                                        {!isSortOptionLoading && <DropdownButton className="product-sort"  variant="secondary" title={sortOptionsDict[sortOption]} onSelect={handleSortOptions}>
                                                     <Dropdown.Item eventKey="alphabetical">Alphabetical</Dropdown.Item>
                                                     <Dropdown.Item eventKey="price-low-to-high">Price - Low to High</Dropdown.Item>
                                                     <Dropdown.Item eventKey="price-high-to-low">Price - High to Low</Dropdown.Item>
@@ -183,7 +183,7 @@ function ProductsByCategory(){
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                { !isLoading && !isProductsLoading && !isWishlistLoading  && !isCartLoading && <div className="row">
+                                { !isLoading && !isProductsLoading && !isWishlistLoading  && <div className="row">
                                     {products.map((product)=>{ 
                                         
                                         const productId = product.id

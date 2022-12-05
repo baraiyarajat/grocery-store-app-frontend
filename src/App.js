@@ -9,6 +9,7 @@ import './assets/css/style.css';
 import './assets/css/responsive.css';
 import './assets/css/night-mode.css';
 import './assets/css/step-wizard.css';
+import './assets/css/cartmodal.css'
 
 // // Vendor Stylesheets
 import './assets/vendor/fontawesome-free/css/all.min.css';
@@ -28,6 +29,7 @@ import Wishlist from './pages/wishlist';
 import Orders from './pages/orders';
 import Wallet from './pages/wallet';
 import Address from './pages/address';
+import Checkout from './pages/checkout';
 
 import Rewards from './pages/rewards';
 import ProductsByCategory from './pages/productsByCategory';
@@ -52,6 +54,7 @@ function App() {
         <Route path='/address' element={<Address/>} ></Route>        
         <Route path='/rewards' element={<Rewards/>} ></Route>
         <Route path='/new-products' element={<NewProducts/>}></Route>
+        <Route path='/checkout' element={<Checkout/>}></Route>
         <Route path='/products-by-category/:categorySlug' element={<ProductsByCategory/>} ></Route>
         <Route path='/products/:productSlug' element={<SingleProduct/>}  ></Route>
         <Route path='*' element={<Error/>} ></Route>
