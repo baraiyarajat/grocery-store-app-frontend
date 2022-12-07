@@ -63,7 +63,7 @@ function UserAuthenticatedItems({user}){
     return(
         <>
             <li>
-                {!isWishlistLoading && <Link to="/wishlist" className="option_links" title="Wishlist"><i className='uil uil-heart icon_wishlist'></i><span className="noti_count1">{wishlistProducts.length}</span></Link>}
+                { <Link to="/wishlist" className="option_links" title="Wishlist"><i className='uil uil-heart icon_wishlist'></i><span className="noti_count1">{wishlistProducts.length}</span></Link>}
             </li>	
             
 
