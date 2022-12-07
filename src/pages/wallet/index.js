@@ -5,9 +5,53 @@ import {Link} from 'react-router-dom';
 //Includes
 import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { addCreditToWallet, getWalletDetails } from '../../store/wallet/walletSlice';
+import { useState } from 'react';
 
 function Wallet(){
+
+    const {wallet, isWalletLoading} = useSelector((store)=> store.wallet)
+
+    const initialCardDetails = {"cardHolderName":"",
+                                "cardNumber":"",
+                                "expr_month":"",
+                                "expr_year":"",
+                                "cvv":"",
+                                "credit_amount":""}
+
+    const [cardDetails, setCardDetails] = useState(initialCardDetails)
+
+
+    const handleCardFormChange = (e) =>{
+
+        const name = e.target.name;
+        const value = e.target.value;
+        setCardDetails({...cardDetails, [name]:value})
+
+    }
+
+    const dispatch = useDispatch()
+
+    const handleCardFormSubmit = async (e) =>{
+        e.preventDefault()
+        
+        await Promise.all([
+            dispatch(addCreditToWallet(cardDetails))
+        ])
+
+        setCardDetails(initialCardDetails)
+        return dispatch(getWalletDetails());
+        
+    }
+
+    useEffect(()=>{
+        dispatch(getWalletDetails())
+    },[dispatch])
+
+
+    
 
     return(
         <>
@@ -80,8 +124,9 @@ function Wallet(){
                                                             <img src="images/money.svg" alt=""/>
                                                         </div>
                                                         <span className="rewrd-title">My Balance</span>
-                                                        <h4 className="cashbk-price">$120</h4>
-                                                        <span className="date-reward">Added : 8 May 2020</span>
+                                                        <h4 className="cashbk-price">${wallet.credit}</h4>
+                                                        {/* <span className="date-reward">Added : 8 May 2020</span> */}
+                                                        <span className="date-reward">Last Updated : {wallet.formatted_modified_date}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -92,7 +137,7 @@ function Wallet(){
                                                             <img className="rotate-img" src="images/business.svg" alt=""/>
                                                         </div>
                                                         <span className="rewrd-title">Gambo Cashback Blance</span>
-                                                        <h4 className="cashbk-price">$5</h4>
+                                                        <h4 className="cashbk-price">${wallet.cashback_balance}</h4>
                                                         <p>100% of thiscan be used for your next order.</p>
                                                     </div>
                                                 </div>
@@ -149,6 +194,7 @@ function Wallet(){
                                                     <div className="pdpt-title">
                                                         <h4>Add Balance</h4>
                                                     </div>
+                                                    <form onSubmit={(e)=>handleCardFormSubmit(e)} >
                                                     <div className="add-cash-body">
                                                         <div className="row">
                                                             <div className="col-lg-6 col-md-12">
@@ -156,7 +202,7 @@ function Wallet(){
                                                                     <label className="control-label">Holder Name*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            {/* <input className="prompt srch_explore" type="text" name="holdername" value="" id="holder[name]" required="" maxlength="64" placeholder="Holder Name"/>															 */}
+                                                                            <input className="prompt srch_explore" type="text" name="cardHolderName" value={cardDetails.cardHolderName} onChange={handleCardFormChange} id="card[name]" required={true} maxLength="64" placeholder="Holder Name"/>															
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -166,7 +212,7 @@ function Wallet(){
                                                                     <label className="control-label">Card Number*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            {/* <input className="prompt srch_explore" type="text" name="cardnumber" value="" id="card[number]" required="" maxlength="64" placeholder="Card Number"/>															 */}
+                                                                            <input className="prompt srch_explore" type="text" name="cardNumber" value={cardDetails.cardNumber} onChange={handleCardFormChange} id="card[number]" required={true} maxLength="16" minLength="16" placeholder="Card Number"/>															
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -174,7 +220,7 @@ function Wallet(){
                                                             <div className="col-lg-4 col-md-4">
                                                                 <div className="form-group mt-1">																	
                                                                     <label className="control-label">Expiration Month*</label>
-                                                                    <select className="ui fluid search dropdown form-dropdown" name="card[expire-month]">
+                                                                    <select className="ui fluid search dropdown form-dropdown" value={cardDetails.expr_month} onChange={handleCardFormChange} name="expr_month" required>
                                                                         <option value="">Month</option>
                                                                         <option value="1">January</option>
                                                                         <option value="2">February</option>
@@ -196,7 +242,7 @@ function Wallet(){
                                                                     <label className="control-label">Expiration Year*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            <input className="prompt srch_explore" type="text" name="card[expire-year]" maxLength="4" placeholder="Year"/>															
+                                                                            <input className="prompt srch_explore" type="text" value={cardDetails.expr_year} name="expr_year"  onChange={handleCardFormChange} minLength="4" maxLength="4" placeholder="Year" required />															
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -206,7 +252,7 @@ function Wallet(){
                                                                     <label className="control-label">CVV*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            <input className="prompt srch_explore" name="card[cvc]" maxLength="3" placeholder="CVV"/>															
+                                                                            <input className="prompt srch_explore" name="cvv" value={cardDetails.cvv} onChange={handleCardFormChange} minLength="3" maxLength="3" placeholder="CVV" required/>															
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -216,14 +262,15 @@ function Wallet(){
                                                                     <label className="control-label">Add Balance*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            <input className="prompt srch_explore" type="text" name="addbalance" maxLength="3" placeholder="$0"/>															
+                                                                            <input className="prompt srch_explore" type="text" name="credit_amount" value={cardDetails.credit_amount} onChange={handleCardFormChange}  maxLength="3" placeholder="$0"/>															
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <a href="#" className="next-btn16 hover-btn mt-3">Add Balance</a>
+                                                        <button type="submit" className="next-btn16 hover-btn mt-3">Add Balance</button>
                                                     </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 col-md-12">
