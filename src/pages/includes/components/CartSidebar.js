@@ -132,7 +132,7 @@ function CartSidebar({showCartModal, setShowCartModal}){
 
             <Modal.Body id="cart-modal-body">  
                 <div class="side-cart-items">
-                    {!isCartLoading && cartItems.map((item)=>{
+                    { cartItems.map((item)=>{
                         return <CartItem key={item.id} cartProduct={item} setShowCartModal={setShowCartModal} />
                     })}
                 </div>
