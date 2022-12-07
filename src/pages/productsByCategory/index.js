@@ -183,7 +183,7 @@ function ProductsByCategory(){
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                { !isLoading && !isProductsLoading && !isWishlistLoading  && <div className="row">
+                                { !isLoading && !isProductsLoading   && <div className="row">
                                     {products.map((product)=>{ 
                                         
                                         const productId = product.id
