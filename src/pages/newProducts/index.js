@@ -138,7 +138,7 @@ function NewProducts(){
                                 </div>
                             </div>
                             <div className="product-list-view">
-                                {!isNewProductsLoading && !isWishlistLoading  && <div className="row">
+                                {!isNewProductsLoading  && <div className="row">
                                     {newProducts.map((product)=>{ 
                                         
                                         const productId = product.id
