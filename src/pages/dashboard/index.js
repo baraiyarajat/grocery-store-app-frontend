@@ -5,10 +5,23 @@ import {Link} from 'react-router-dom';
 //Includes
 import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getWalletDetails } from '../../store/wallet/walletSlice';
 
 
 
 function Dashboard(){
+
+
+    const {wallet, isWalletLoading} = useSelector((store)=>store.wallet)
+
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+        dispatch(getWalletDetails())
+    },[dispatch])
+
 
     return (
         <>  
@@ -127,7 +140,7 @@ function Dashboard(){
                                                         <h4>My Wallet</h4>
                                                     </div>
                                                     <div className="wllt-body">
-                                                        <h2>Credits $100</h2>
+                                                        <h2>Credits ${wallet.credit}</h2>
                                                         <ul className="wallet-list">
                                                             <li>
                                                                 <a href="#" className="wallet-links14"><i className="uil uil-card-atm"></i>Payment Methods</a>
@@ -140,7 +153,7 @@ function Dashboard(){
                                                             </li>	
                                                         </ul>
                                                     </div>
-                                                    <a href="#" className="more-link14">Rewards and Details <i className="uil uil-angle-double-right"></i></a>
+                                                    <Link to="/wallet" className="more-link14">Wallet Details<i className="uil uil-angle-double-right"></i></Link>
                                                 </div>
                                             </div>
                                         </div>
