@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import axios from "axios"
+// import axios from "axios"
+import axios from "../../api/axios"
 
 
 const initialwalletState = {
@@ -9,7 +10,8 @@ const initialwalletState = {
     'isWalletLoading':true,
 }
 
-const walletUrl = "http://127.0.0.1:8000/api/v0/wallet/"
+// const walletUrl = "http://127.0.0.1:8000/api/v0/wallet/"
+const walletUrl = "/api/v0/wallet/"
 
 export const getWalletDetails = createAsyncThunk(
     'wallet/getWalletDetails',

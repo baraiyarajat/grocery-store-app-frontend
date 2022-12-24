@@ -12,6 +12,7 @@ function SingleProduct (){
 
     const params = useParams();
     const productSlug = params.productSlug
+    
     const [cartObject, setCartObject] = useState({"inCart":false,
                                                    "cartItemId":null})
     
@@ -20,7 +21,7 @@ function SingleProduct (){
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
     const {cartItems, isCartLoading} = useSelector((store)=>store.cart)
 
-    const imageUrl = `http://127.0.0.1:8000${singleProduct.product.image}`
+    
 
     const dispatch = useDispatch()
 
@@ -80,6 +81,9 @@ function SingleProduct (){
 
     }
 
+    
+    
+
     return (
         <>
             <Navbar/>
@@ -107,14 +111,14 @@ function SingleProduct (){
                                     <div className="product-dt-view">
                                         <div className="row">
                                             <div className="col-lg-4 col-md-4">
-                                                <img src={imageUrl} width="380" height="380" alt=""/>
+                                               {!isSingleProductLoading && <img src={singleProduct.product.image} width="380" height="380" alt=""/>}
                                             </div>
                                             <div className="col-lg-8 col-md-8">
                                                 <div className="product-dt-right">
                                                     {!isSingleProductLoading &&  <h2>{singleProduct.product.name}</h2>}
                                                     <div className="no-stock">
-                                                        {singleProduct.stock>0 &&  <p className="stock-qty">Available<span>(Instock)</span></p>}
-                                                        {!singleProduct.stock>0 &&  <p className="stock-qty">Available<span>(Instock)</span></p>}
+                                                        {singleProduct.stock>0 &&  <p className="stock-qty">Available<span>(In stock)</span></p>}
+                                                        {!singleProduct.stock>0 &&  <p className="stock-qty">Unavailable<span>(Out of stock)</span></p>}
                                                     </div>
                                                     
                                                     {!isSingleProductLoading && <p className="pp-descp">{singleProduct.product.description}</p>}
@@ -125,14 +129,14 @@ function SingleProduct (){
                                                             {!singleProduct.discount_rate>0 && <li><div className="main-price "> Price<span>${singleProduct.price}</span></div></li>}
                                                         </ul>
                                                         <ul className="gty-wish-share">
-                                                            <li>
+                                                            <li>                                                    
                                                                 {!isWishlistLoading &&  !inWishlist && <span className="like-icon save-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
                                                                 {!isWishlistLoading &&   inWishlist && <span className="like-icon save-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}  
                                                             </li>
                                                         </ul>
                                                         <ul className="ordr-crt-share">
                                                              {cartObject.inCart && <li><button className="add-cart-btn hover-btn"  onClick={(e)=>deleteFromCartHandler(e)} ><i className="uil uil-shopping-cart-alt"></i>Remove from Cart</button></li>}
-                                                             {!cartObject.inCart  && <li><button className="add-cart-btn hover-btn" onClick={(e)=>addToCartHandler(e)}><i className="uil uil-shopping-cart-alt"></i>Add to Cart</button></li>}
+                                                             {!cartObject.inCart  && singleProduct.stock>0 && <li><button className="add-cart-btn hover-btn" onClick={(e)=>addToCartHandler(e)}><i className="uil uil-shopping-cart-alt"></i>Add to Cart</button></li>}                                                      
                                                         </ul>
                                                     </div>
                                                     <div className="pdp-details">

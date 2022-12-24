@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../api/axios";
 
 
 const initialCategoryState = {
@@ -9,7 +10,7 @@ const initialCategoryState = {
 }
 
 
-const getCategoryUrl = "http://127.0.0.1:8000/api/v0/categories/"
+const getCategoryUrl = "/api/v0/categories/"
 
 export const getCategoryBySlug = createAsyncThunk(
     'category/getCategoryBySlug',

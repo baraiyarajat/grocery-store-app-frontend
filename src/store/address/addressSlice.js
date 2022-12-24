@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { useDispatch } from "react-redux";
+// import axios from "axios";
+import axios from "../../api/axios";
 
 
 const initialAddressState = {
@@ -9,13 +9,15 @@ const initialAddressState = {
 }
 
 
-const getAddressesUrl = 'http://127.0.0.1:8000/api/v0/addresses/'
+const getAddressesUrl = '/api/v0/addresses/'
+// const getAddressesUrl = 'http://127.0.0.1:8000/api/v0/addresses/'
 
 
 export const getAddresses = createAsyncThunk(
     'address/getAddresses',
     async (name, thunkAPI) =>{
-
+        
+        
         const user_id = thunkAPI.getState().user.user.id
         try{
             const resp = await axios.get(getAddressesUrl,{ params: { user_id: user_id } })
@@ -29,14 +31,14 @@ export const getAddresses = createAsyncThunk(
 )
 
 
-const addressApiUrl = 'http://127.0.0.1:8000/api/v0/addresses/'
+// const addressApiUrl = 'http://127.0.0.1:8000/api/v0/addresses/'
+const addressApiUrl = '/api/v0/addresses/'
 
 export const deleteAddress = createAsyncThunk(
     'address/deleteAddress',
     async (addressId, thunkAPI) =>{
         try{            
             const deleteAddressUrl = addressApiUrl.concat(addressId)
-            console.log(deleteAddressUrl)
             const resp = await axios.delete(deleteAddressUrl)
             return resp.data
         }catch{

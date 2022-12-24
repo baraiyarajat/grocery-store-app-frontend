@@ -1,5 +1,7 @@
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../api/axios";
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
+
 
 
 const initialCartState = {
@@ -13,13 +15,17 @@ const initialCartState = {
     promoCode:{}
 }
 
-const cartUrl = "http://127.0.0.1:8000/api/v0/cart/"
+const cartUrl = "/api/v0/cart/"
+// const cartUrl = "http://127.0.0.1:8000/api/v0/cart/"
 export const getCartItems = createAsyncThunk(
     'cart/getCartItems',
     async (name, thunkAPI) =>{
         try{
+            
+            
             const userId = thunkAPI.getState().user.user.id
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+            
             const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
             return resp.data
 
@@ -33,6 +39,7 @@ export const addCartItem = createAsyncThunk(
     'cart/addCartItem',
     async (warehouseProductId, thunkAPI) =>{
         try{
+            
             const userId = thunkAPI.getState().user.user.id
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
             const addCartProductUrl = `${cartUrl}add`
@@ -58,6 +65,24 @@ export const deleteCartItem = createAsyncThunk(
         }
         
     } 
+)
+
+export const emptyCart = createAsyncThunk(
+    'cart/emptyCart',
+    async(name, thunkAPI)=>{
+        try{
+
+            const userId = thunkAPI.getState().user.user.id
+            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+            const emptyCartUrl = `${cartUrl}/empty-cart`
+            const resp = await axios.post(emptyCartUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId} )
+            return resp.data
+
+            
+        }catch{
+            return thunkAPI.rejectWithValue("Not able to empty the cart")
+        }
+    }
 )
 
 
@@ -149,6 +174,14 @@ const cartSlice = createSlice({
         }).addCase(addCartItem.fulfilled,(state,action)=>{
             state.isCartLoading = false
         }).addCase(addCartItem.rejected,(state)=>{
+            state.isCartLoading = false
+        }).addCase(emptyCart.pending,(state)=>{
+            state.isCartLoading = true
+        }).addCase(emptyCart.fulfilled,(state,action)=>{
+            state.isCartLoading = false
+            
+            
+        }).addCase(emptyCart.rejected,(state)=>{
             state.isCartLoading = false
         })
     }

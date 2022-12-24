@@ -4,15 +4,15 @@ import {Link} from 'react-router-dom';
 
 
 // //Category Icons
-import icon1 from '../../../assets/images/category/icon-1.svg'
-import icon2 from '../../../assets/images/category/icon-2.svg'
-import icon3 from '../../../assets/images/category/icon-3.svg'
-import icon4 from '../../../assets/images/category/icon-4.svg'
-import icon5 from '../../../assets/images/category/icon-5.svg'
-import icon6 from '../../../assets/images/category/icon-6.svg'
-import icon7 from '../../../assets/images/category/icon-7.svg'
-import icon8 from '../../../assets/images/category/icon-8.svg'
-import icon9 from '../../../assets/images/category/icon-9.svg'
+// import icon1 from '../../../assets/images/category/icon-1.svg'
+// import icon2 from '../../../assets/images/category/icon-2.svg'
+// import icon3 from '../../../assets/images/category/icon-3.svg'
+// import icon4 from '../../../assets/images/category/icon-4.svg'
+// import icon5 from '../../../assets/images/category/icon-5.svg'
+// import icon6 from '../../../assets/images/category/icon-6.svg'
+// import icon7 from '../../../assets/images/category/icon-7.svg'
+// import icon8 from '../../../assets/images/category/icon-8.svg'
+// import icon9 from '../../../assets/images/category/icon-9.svg'
 
 
 function SearchModel(){
@@ -20,7 +20,7 @@ function SearchModel(){
 
     return(
         <>
-            <div id="search_model" className="header-cate-model main-gambo-model modal fade" tabIndex="-1" role="dialog" aria-modal="false">
+            {/* <div id="search_model" className="header-cate-model main-gambo-model modal fade" tabIndex="-1" role="dialog" aria-modal="false">
                 <div className="modal-dialog search-ground-area" role="document">
                     <div className="category-area-inner">
                         <div className="modal-header">
@@ -96,7 +96,7 @@ function SearchModel(){
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
         </>
     )

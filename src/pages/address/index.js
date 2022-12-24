@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-import axios from 'axios';
+// import axios from 'axios';
+import axios from '../../api/axios'
 import { useNavigate } from 'react-router-dom';
 
 import {PencilIcon, TrashIcon} from '@primer/octicons-react'
@@ -93,7 +94,8 @@ function Address(){
 
     const dispatch = useDispatch()
     const {addresses, isLoading} = useSelector((store)=>store.address)
-    const {user, isAuthenticated} = useSelector((store)=>store.user)
+    const {user} = useSelector((store)=>store.user)
+    const {isAuthenticated} = useSelector((store)=>store.auth)
     const warehouseObject = useSelector((store)=>store.warehouse)
 
     const [showModal, setShow] = useState(false);
@@ -145,7 +147,7 @@ function Address(){
 
 
         if(addressFormData["address_id"] != null){            
-            axios.patch('http://127.0.0.1:8000/api/v0/addresses/edit-address', addressFormData).then((response) => {
+            axios.patch('/api/v0/addresses/edit-address', addressFormData).then((response) => {
             dispatch(getAddresses())
             setAddressObject(initialAddressObject)
             setShow(false)
@@ -159,7 +161,7 @@ function Address(){
         });
         }else{
             
-            axios.post('http://127.0.0.1:8000/api/v0/addresses/add-address', addressFormData)
+            axios.post('/api/v0/addresses/add-address', addressFormData)
         .then((response) => {
             dispatch(getAddresses())
 
@@ -181,7 +183,7 @@ function Address(){
 
     useEffect(()=>{
         dispatch(getAddresses())
-    },[dispatch])
+    },[dispatch,user])
 
     return (
         <>
@@ -329,7 +331,7 @@ function Address(){
                                                             </div>
                                                         </Modal>
 
-                                                        {!isLoading && addresses.map((address)=> <AddressItem key={address.id} address={address} showModal={showModal}  setShow={setShow} addressObject={addressObject} setAddressObject={setAddressObject}  />)}
+                                                        { addresses.length > 0 &&  addresses.map((address)=> <AddressItem key={address.id} address={address} showModal={showModal}  setShow={setShow} addressObject={addressObject} setAddressObject={setAddressObject}  />)}
                                                                     
                                                     </div>
                                                 </div>

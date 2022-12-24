@@ -5,13 +5,13 @@ import { useSelector } from "react-redux";
 import { getWarehouses } from "../../store/warehouse/warehouseSlice";
 
 //images
-import pyicon1 from '../../assets/images/footer-icons/pyicon-1.svg'
-import pyicon2 from '../../assets/images/footer-icons/pyicon-2.svg'
-import pyicon3 from '../../assets/images/footer-icons/pyicon-3.svg'
-import pyicon4 from '../../assets/images/footer-icons/pyicon-4.svg'
-import pyicon6 from '../../assets/images/footer-icons/pyicon-6.svg'
-import download1 from '../../assets/images/download-1.svg'   
-import download2 from '../../assets/images/download-2.svg'   
+// import pyicon1 from '../../assets/images/footer-icons/pyicon-1.svg'
+// import pyicon2 from '../../assets/images/footer-icons/pyicon-2.svg'
+// import pyicon3 from '../../assets/images/footer-icons/pyicon-3.svg'
+// import pyicon4 from '../../assets/images/footer-icons/pyicon-4.svg'
+// import pyicon6 from '../../assets/images/footer-icons/pyicon-6.svg'
+// import download1 from '../../assets/images/download-1.svg'   
+// import download2 from '../../assets/images/download-2.svg'   
 import { useDispatch } from "react-redux";
 import { getCategories } from "../../store/category/categoriesSlice";
 
@@ -103,8 +103,10 @@ function Footer(){
                                 <div className="second-row-item-app">
                                     <h4>Download App</h4>
                                     <ul>
-                                        <li><Link to="#"><img className="download-btn" src={download1} alt=""/></Link></li>
-                                        <li><Link to="#"><img className="download-btn" src={download2} alt=""/></Link></li>
+                                        {/* <li><Link to="#"><img className="download-btn" src={download1} alt=""/></Link></li>
+                                        <li><Link to="#"><img className="download-btn" src={download2} alt=""/></Link></li> */}
+                                        <li><Link to="#"><img className="download-btn" src="/images/download-1.svg" alt=""/></Link></li>
+                                        <li><Link to="#"><img className="download-btn" src="/images/download-2.svg" alt=""/></Link></li>
                                     </ul>
                                 </div>
                                 <div className="second-row-item-payment">
@@ -112,19 +114,24 @@ function Footer(){
                                     <div className="footer-payments">
                                         <ul id="paypal-gateway" className="financial-institutes">
                                             <li className="financial-institutes__logo">
-                                                <img alt="Visa" title="Visa" src={pyicon6}/>
+                                                {/* <img alt="Visa" title="Visa" src={pyicon6}/> */}
+                                                <img alt="Visa" title="Visa" src="/images/footer-icons/pyicon-6.svg"/>
                                             </li>
                                             <li className="financial-institutes__logo">
-                                                <img alt="Visa" title="Visa" src={pyicon1}/>
+                                                {/* <img alt="Visa" title="Visa" src={pyicon1}/> */}
+                                                <img alt="Visa" title="Visa" src="/images/footer-icons/pyicon-1.svg"/>
                                             </li>
                                             <li className="financial-institutes__logo">
-                                                <img alt="MasterCard" title="MasterCard" src={pyicon2}/>
+                                                {/* <img alt="MasterCard" title="MasterCard" src={pyicon2}/> */}
+                                                <img alt="MasterCard" title="MasterCard" src="/images/footer-icons/pyicon-2.svg"/>
                                             </li>
                                             <li className="financial-institutes__logo">
-                                                <img alt="American Express" title="American Express" src={pyicon3}/>
+                                                {/* <img alt="American Express" title="American Express" src={pyicon3}/> */}
+                                                <img alt="American Express" title="American Express" src="/images/footer-icons/pyicon-3.svg"/>
                                             </li>
                                             <li className="financial-institutes__logo">
-                                                <img alt="Discover" title="Discover" src={pyicon4}/>
+                                                {/* <img alt="Discover" title="Discover" src={pyicon4}/> */}
+                                                <img alt="Discover" title="Discover" src="/images/footer-icons/pyicon-4.svg"/>
                                             </li>
                                         </ul>
                                     </div>

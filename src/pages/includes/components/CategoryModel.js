@@ -7,7 +7,6 @@ import {Link, Navigate, useNavigate} from 'react-router-dom';
 
 function CategoryItem(params){
     const category = params.category
-    const imageUrl = `http://127.0.0.1:8000${category.image}`
     const navigate = useNavigate();
     const handleModalClick = (e) =>{
         e.preventDefault()
@@ -19,7 +18,7 @@ function CategoryItem(params){
             <li>
                 <Link  onClick={(e)=>handleModalClick(e)} className="single-cat-item">
                     <div className="icon">
-                        <img src={imageUrl} alt="category_image"/>
+                        <img src={category.image} alt="category_image"/>
                     </div>
                     <div className="text"> {category.name} </div>
                 </Link>

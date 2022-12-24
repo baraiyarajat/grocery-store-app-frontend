@@ -47,14 +47,14 @@ function NewProductItem(params){
     }
 
 
-    const imageUrl = `http://127.0.0.1:8000${params.product.product.image}`
+    // const imageUrl = `http://127.0.0.1:8000${params.product.product.image}`
 
 
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
                 <Link to={`/products/${params.product.product.slug}`} className="product-img">
-                    <img src={imageUrl} width="200" height="200" alt=""/>
+                    <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
                         { params.product.discount_rate!==0 && <span className="offer-badge-1">{params.product.discount_rate}% off</span>}

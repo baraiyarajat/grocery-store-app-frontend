@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../api/axios";
 
 
 
-const warehouseProductUrl = 'http://127.0.0.1:8000/api/v0/warehouse_products/'
+// const warehouseProductUrl = 'http://127.0.0.1:8000/api/v0/warehouse_products/'
+const warehouseProductUrl = '/api/v0/warehouse_products/'
 
 
 const initialProductState = {

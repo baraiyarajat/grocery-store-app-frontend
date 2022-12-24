@@ -7,14 +7,14 @@ import Footer from '../includes/Footer';
 
 
 //Images
-import offer1Banner from '../../assets/images/banners/offer-1.jpg'
-import offer2Banner from '../../assets/images/banners/offer-2.jpg'
-import offer3Banner from '../../assets/images/banners/offer-3.jpg'
-import offer4Banner from '../../assets/images/banners/offer-4.jpg'
-import offer5Banner from '../../assets/images/banners/offer-5.jpg'
+// import offer1Banner from '../../assets/images/banners/offer-1.jpg'
+// import offer2Banner from '../../assets/images/banners/offer-2.jpg'
+// import offer3Banner from '../../assets/images/banners/offer-3.jpg'
+// import offer4Banner from '../../assets/images/banners/offer-4.jpg'
+// import offer5Banner from '../../assets/images/banners/offer-5.jpg'
 
 
-import img1 from '../../assets/images/product/img-1.jpg'
+// import img1 from '../../assets/images/product/img-1.jpg'
 
 
 
@@ -24,18 +24,21 @@ import "owl.carousel/dist/assets/owl.theme.default.css";
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { getCategories } from '../../store/category/categoriesSlice';
-import { getNewWarehouseProducts } from '../../store/newProducts/newProductsSlice';
+import { getNewVegetablesAndFruits, getNewWarehouseProducts } from '../../store/newProducts/newProductsSlice';
 import { getWishlist } from '../../store/wishlist/wishlistSlice';
 import {addWishlistProduct, deleteWishlistProduct} from '../../store/wishlist/wishlistSlice'
+import { getFeaturedProducts } from '../../store/featuredProducts/featuredProductsSlice';
+import { useState } from 'react';
 
 function CategoryItem(params){
     const category = params.category
-    const imageUrl = `http://127.0.0.1:8000${category.image}`
+    // const imageUrl = `http://127.0.0.1:8000${category.image}`
+    
     return(
         <div className="item">
             <Link to={`/products-by-category/${category.slug}`} className="category-item">
                 <div className="cate-img">
-                    <img src={imageUrl} alt="category_image"/>
+                    <img src={category.image} alt="category_image"/>
                 </div>
                 <h4>{category.name}</h4>
             </Link>
@@ -44,43 +47,49 @@ function CategoryItem(params){
 }
 
 
-function ProductItem({product, wishlistProduct, inWishlist}){
+function ProductItem({product}){
+
+
+    const {wishlistProducts, isWishlistLoading} = useSelector((store)=>store.wishlist)
+
+    const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{
+                                            return wishlistProduct.warehouse_product.id === product.id 
+                                        })[0]
+                                        
+    const inWishlist = wishlistProduct && true
+
+
+    // const dispatch = useDispatch()
+    // const imageUrl = `http://127.0.0.1:8000${product.product.image}`
 
     const dispatch = useDispatch()
-
-    const addToWishlistHandler = (e) =>{
+    const addProductToWishlistHandler = (e) =>{
         e.preventDefault()
         dispatch(addWishlistProduct(product.id))
     }
 
-
-    const deleteFromWishlistHandler = async (e) =>{
+    const deleteProductFromWishlist = (e) =>{
         e.preventDefault()
-        await Promise.all([
-            dispatch(deleteWishlistProduct(wishlistProduct.id))
-        ]);
-        return dispatch(getWishlist());
+        dispatch(deleteWishlistProduct(wishlistProduct.id))
     }
 
-
-    const imageUrl = `http://127.0.0.1:8000${product.product.image}`
 
     return(
         <>
             <div className="item">
                 <div className="product-item">
                     <Link to={`/products/${product.product.slug}`} className="product-img">
-                        <img src={imageUrl} width="300" height="300" alt="product_image"/>
+                        <img src={product.product.image} width="300" height="300" alt="product_image"/>
                         <div className="product-absolute-options">
                             <span className="offer-badge-1">New</span>
-                            {!inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                            {!inWishlist && <span className="like-icon " title="wishlist"  onClick={(e)=>addProductToWishlistHandler(e)}></span>}
                         
-                            {inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
+                            {inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteProductFromWishlist(e)}></span>}
                         </div>
                     </Link>
                     <div className="product-text-dt">
                         {product.stock>0 && <p>Available<span>(In Stock)</span></p>}
-                        {product.stock==0 && <p>Unavailable<span>(Out of Stock)</span></p>}
+                        {product.stock===0 && <p>Unavailable<span>(Out of Stock)</span></p>}
                         {/* <p>Available<span>(In Stock)</span></p> */}
                         <h4>{product.product.name}</h4>
                         
@@ -109,16 +118,44 @@ function Home(){
 
     const {categories, isCategoriesLoading} = useSelector((store)=>store.categories)
     const {warehouse,isLoading} = useSelector((store)=>store.selectedWarehouse)
-    const {newProducts, isNewProductsLoading} = useSelector((store)=>store.newProducts)
+    const {newProducts, freshVegetablesAndFruits ,isNewProductsLoading, isFreshVegetablesAndFruitsLoading} = useSelector((store)=>store.newProducts)
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)   
+    const {featuredProducts, isFeaturedProductsLoading} = useSelector((store)=>store.featuredProducts)
 
+    
+    const initialCarouselPositions = {
+        'newProductsPosition':'0'
+    }
+
+    const [carouselPositions, setCarouselPositions ] = useState(initialCarouselPositions)
     const dispatch = useDispatch()
+
+    const handleCarouselPositionsUpdate = (object) =>{
+        console.log(object)
+        // if(object.item.index !=carouselPositions.newProductsPosition){
+        //     setCarouselPositions({
+        //         ...carouselPositions,
+        //         newProductsPosition:object.item.index
+        //     })
+        // }
+    }
+
 
     useEffect(()=>{
         dispatch(getNewWarehouseProducts())
     },[warehouse, dispatch])
     
+
+    useEffect(()=>{
+        dispatch(getNewVegetablesAndFruits())
+    },[warehouse, dispatch])
     
+    useEffect(()=>{
+        dispatch(getFeaturedProducts())
+                
+    },[warehouse, dispatch])
+
+
     useEffect(()=>{
         dispatch(getCategories())
     },[dispatch])
@@ -126,6 +163,7 @@ function Home(){
     useEffect(()=>{
         dispatch(getWishlist())
     },[warehouse, dispatch])
+
     
     return(
         <>
@@ -135,7 +173,7 @@ function Home(){
             {/* Home Content */}
             <div className="wrapper">
 
-                <div className="main-banner-slider">
+                {/* <div className="main-banner-slider">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -224,7 +262,7 @@ function Home(){
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="section145">
                     <div className="container">
@@ -238,7 +276,7 @@ function Home(){
                                 </div>
                             </div>
                             <div className="col-md-12">
-                                <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
+                                <OwlCarousel className="featured-slider owl-theme " loop margin={10} items={6}   nav>
 
                                     {! isCategoriesLoading && 
                                         
@@ -263,116 +301,24 @@ function Home(){
                                         <span>For You</span>
                                         <h2>Top Featured Products</h2>
                                     </div>
-                                    <a href="#" className="see-more-btn">See All</a>
+                                    <Link to="/featured-products" className="see-more-btn">See All</Link>
                                 </div>
                             </div>
+                            
+                            
                             <div className="col-md-12">
-                                <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src={img1} alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">6% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$12 <span>$15</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-2.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">2% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$10 <span>$13</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-3.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">5% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$5 <span>$8</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-3.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">5% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$5 <span>$8</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    
-                                </OwlCarousel>
+                                {featuredProducts &&  <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
+                                    {featuredProducts.slice(0,9).map((product)=>{                                                                                                                                               
+                                        return <ProductItem key={product.id} product={product}   />
+                                    })}
+                                </OwlCarousel>}
                             </div>
+                            
                         </div>
                     </div>
                 </div>
 
-                <div className="section145">
+                {/* <div className="section145">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -408,7 +354,7 @@ function Home(){
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="section145">
                     <div className="container">
@@ -419,114 +365,18 @@ function Home(){
                                         <span>For You</span>
                                         <h2>Fresh Vegetables & Fruits</h2>
                                     </div>
-                                    <a href="#" className="see-more-btn">See All</a>
+                                    <Link to="/products-by-category/vegetables-and-fruits" className="see-more-btn">See All</Link>
                                 </div>
                             </div>
+
                             <div className="col-md-12">
-                                <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src={img1} alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">6% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$12 <span>$15</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-2.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">2% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$10 <span>$13</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-3.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">5% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$5 <span>$8</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="item">
-                                        <div className="product-item">
-                                            <a href="#" className="product-img">
-                                                <img src="images/product/img-3.jpg" alt=""/>
-                                                <div className="product-absolute-options">
-                                                    <span className="offer-badge-1">5% off</span>
-                                                    <span className="like-icon" title="wishlist"></span>
-                                                </div>
-                                            </a>
-                                            <div className="product-text-dt">
-                                                <p>Available<span>(In Stock)</span></p>
-                                                <h4>Product Title Here</h4>
-                                                <div className="product-price">$5 <span>$8</span></div>
-                                                <div className="qty-cart">
-                                                    <div className="quantity buttons_added">
-                                                        {/* <input type="button" value="-" className="minus minus-btn"/>
-                                                        <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                                                        <input type="button" value="+" className="plus plus-btn"/> */}
-                                                    </div>
-                                                    <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    
-                                </OwlCarousel>
-
-
-
+                                {  <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
+                                    {freshVegetablesAndFruits.slice(0,9).map((product)=>{                                                                                                                                               
+                                        return <ProductItem key={product.id} product={product}   />
+                                    })}
+                                </OwlCarousel>}
                             </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -545,19 +395,13 @@ function Home(){
                                 </div>
                             </div>
                             <div className="col-md-12">
-                                <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav>
-                                    {!isNewProductsLoading &&  !isWishlistLoading && !isLoading && newProducts.slice(0,9).map((product)=>{
-
-                                        const productId = product.id
-                                        const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{
-                                            return wishlistProduct.warehouse_product.id === productId 
-                                        })[0]
+                                {newProducts &&  <OwlCarousel className="featured-slider owl-theme" loop margin={10} nav startPosition={carouselPositions.newProductsPosition} 
+                                >
+                                    {newProducts.slice(0,9).map((product)=>{
                                         
-                                        const inWishlist = wishlistProduct && true
-                                        
-                                        return <ProductItem key={product.id} product={product} inWishlist={inWishlist} wishlistProduct={wishlistProduct}  />
+                                        return <ProductItem key={product.id} product={product}   />
                                     })}
-                                </OwlCarousel>
+                                </OwlCarousel>}
                             </div>
                         </div>
                     </div>

@@ -1,15 +1,15 @@
 import React from 'react';
 
 import {Link, useNavigate} from 'react-router-dom';
-import { useState } from 'react';
-import axios from 'axios';
+import { useState} from 'react';
+// import axios from 'axios';
+import axios from '../../api/axios';
 
-import logo from '../../assets/images/logo.svg';
-import darkLogo from '../../assets/images/dark-logo.svg';
-
+// import logo from '../../assets/images/logo.svg';
+// import darkLogo from '../../assets/images/dark-logo.svg';
 
 function Register(){
-
+    
 
     const [user, setUser] = useState({firstName:'',
                                        lastName:'',
@@ -45,9 +45,8 @@ function Register(){
 
 
         //Register Account API call
-        axios.post('https://127.0.0.1:8000/accounts/register', registerData)
+        axios.post('/accounts/register', registerData)
         .then((response) => {
-            console.log("User Registered")
             //Redirect to login
             navigate('/login');
         })
@@ -68,8 +67,10 @@ function Register(){
                         <div className="sign-form">
                             <div className="sign-inner">
                                 <div className="sign-logo" id="logo">
-                                    <Link to="/"><img src={logo} alt=""/></Link>
-                                    <Link to="/"><img className="logo-inverse" src={darkLogo} alt=""/></Link>
+                                    {/* <Link to="/"><img src={logo} alt=""/></Link> */}
+                                    <Link to="/"><img src="/images/logo.svg" alt=""/></Link>
+                                    {/* <Link to="/"><img className="logo-inverse" src={darkLogo} alt=""/></Link> */}
+                                    <Link to="/"><img className="logo-inverse" src="/images/dark-logo.svg" alt=""/></Link>
                                 </div>
                                 <div className="form-dt">
                                     <div className="form-inpts checout-address-step">

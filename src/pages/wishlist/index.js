@@ -6,10 +6,11 @@ import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteWishlistProduct, getWishlist } from '../../store/wishlist/wishlistSlice';
+import { addCartItem, deleteCartItem, getCartItems } from '../../store/cart/cartSlice';
 
 
 
-function WishlistItem({wishlistProduct}){
+function WishlistItem({wishlistProduct, inCart, cartProduct}){
 
     
 
@@ -20,14 +21,31 @@ function WishlistItem({wishlistProduct}){
         dispatch(deleteWishlistProduct(wishlistProduct.id))
     }
 
-    const imageUrl = `http://127.0.0.1:8000${wishlistProduct.warehouse_product.product.image}`
+    const deleteFromCartHandler =async (e) =>{
+        e.preventDefault()
+        await Promise.all([
+            dispatch(deleteCartItem(cartProduct.id))
+        ]);
+        return dispatch(getCartItems());
+    }
+
+
+    const addToCartHandler = async(e) =>{
+        e.preventDefault()
+        
+        await Promise.all([
+            dispatch(addCartItem(wishlistProduct.warehouse_product.id))
+        ]);
+        return dispatch(getCartItems());
+
+    }
 
     
     return(
         <div className="cart-item">
             <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} >
                 <div className="cart-product-img">
-                    <img src={imageUrl} height="130" widht="130" alt=""/>
+                    <img src={wishlistProduct.warehouse_product.product.image} height="130" widht="130" alt=""/>
                     { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
                 </div>
             </Link>
@@ -35,6 +53,11 @@ function WishlistItem({wishlistProduct}){
                 <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} ><h4>{wishlistProduct.warehouse_product.product.name}</h4></Link>
                 { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.get_discounted_price} <span>${wishlistProduct.warehouse_product.price}</span></div>}
                 { wishlistProduct.warehouse_product.discount_rate===0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.price} </div>}
+                 <ul className="ordr-crt-share">
+                        {inCart && <li><button className="add-cart-btn hover-btn"  onClick={(e)=>deleteFromCartHandler(e)} ><i className="uil uil-shopping-cart-alt"></i>Remove from Cart</button></li>}
+                        {!inCart  && wishlistProduct.warehouse_product.stock>0 && <li><button className="add-cart-btn hover-btn" onClick={(e)=>addToCartHandler(e)}><i className="uil uil-shopping-cart-alt"></i>Add to Cart</button></li>}                                                      
+                        {!inCart  && wishlistProduct.warehouse_product.stock===0 && <li><p className="stock-qty">Unavailable<span>(Out of stock)</span></p></li>}                                                      
+                </ul>
                 <button type="button" onClick={ ()=> handleDeleteWishlistProduct(wishlistProduct.id)} className="cart-close-btn"><i className="uil uil-trash-alt"></i></button>
             </div>		
         </div>
@@ -46,7 +69,13 @@ function Wishlist(){
 
     const {wishlistProducts, isWishlistLoading } = useSelector((store)=>store.wishlist)
     const {warehouse} = useSelector((store)=>store.selectedWarehouse)
+    const {cartItems, isCartLoading} = useSelector((store)=>store.cart)
+    
     const dispatch = useDispatch()
+
+    useEffect(()=>{
+        dispatch(getCartItems())
+    },[warehouse,dispatch])
 
     useEffect(()=>{
        dispatch(getWishlist())
@@ -121,8 +150,12 @@ function Wishlist(){
                                                     <div className="wishlist-body-dtt">
                                                         
                                                         
-                                                        { !isWishlistLoading && wishlistProducts.map((wishlistProduct)=>{
-                                                            return <WishlistItem key={wishlistProduct.id} wishlistProduct={wishlistProduct} />
+                                                        { !isWishlistLoading && wishlistProducts.map((wishlistProduct)=>{                                                            
+                                                            const cartProduct = cartItems.filter((item)=>{
+                                                                return item.warehouse_product.id === wishlistProduct.warehouse_product.id
+                                                            })[0]
+                                                            const inCart = cartProduct && true
+                                                            return <WishlistItem key={wishlistProduct.id} wishlistProduct={wishlistProduct} inCart={inCart} cartProduct={cartProduct} />
                                                         })}
                                                     
                                                     </div>

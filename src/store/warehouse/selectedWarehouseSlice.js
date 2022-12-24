@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
-import axios from "axios"
+// import axios from "axios"
+import axios from "../../api/axios"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 const initialSelectedWarehouseState = {
@@ -8,14 +9,15 @@ const initialSelectedWarehouseState = {
 }
 
 
-const selectedWarehouseUrl = 'http://127.0.0.1:8000/api/v0/warehouses/selected-warehouse'
+// const selectedWarehouseUrl = 'http://127.0.0.1:8000/api/v0/warehouses/selected-warehouse'
+const selectedWarehouseUrl = '/api/v0/warehouses/selected-warehouse'
 
 export const getSelectedWarehouse = createAsyncThunk(
     'selectedWarehouse/getSelectedWarehouse',
     async (name, thunkAPI) =>{
         try{
-            const userId = thunkAPI.getState().user.user.id
             
+            let userId = thunkAPI.getState().user.user !==""?  thunkAPI.getState().user.user.user.id : null
             let selectedWarehouseId = null 
 
             if(thunkAPI.getState().selectedWarehouse.warehouse !== null){
@@ -31,13 +33,15 @@ export const getSelectedWarehouse = createAsyncThunk(
 
 
 
-const setSelectedWarehouseUrl='http://127.0.0.1:8000/api/v0/warehouses/selected-warehouse'
+// const setSelectedWarehouseUrl='http://127.0.0.1:8000/api/v0/warehouses/selected-warehouse'
+const setSelectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
 
 export const setSelectedWarehouse = createAsyncThunk(
     'selectedWarehouse/setSelectedWarehouse',
     async (warehouseId, thunkAPI) =>{
-        try{
+        try{        
             const userId = thunkAPI.getState().user.user.id
+            
             const resp = await axios.post(setSelectedWarehouseUrl, {"user_id":userId, "selected_warehouse_id":warehouseId})
             return resp.data
         }catch(error){

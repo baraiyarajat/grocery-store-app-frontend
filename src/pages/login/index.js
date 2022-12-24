@@ -1,31 +1,68 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { Link, redirect } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 // Images
-import logo from '../../assets/images/logo.svg'
-import darkLogo from '../../assets/images/dark-logo.svg'
+// import logo from '../../assets/images/logo.svg'
+// import darkLogo from '../../assets/images/dark-logo.svg'
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { authenticateUser, userLogin } from "../../store/auth/authSlice";
+import { useRef } from "react";
+import { useEffect } from "react";
 
 
 function Login(){
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const[redirect, setRedirect] = useState(false)
-
+    const userRef = useRef();
+    const errRef = useRef();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
 
     
-    const handleLoginSubmit = async (e) =>{
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    
+    const [errMsg, setErrMsg] = useState('')
+    
+    const {isAuthenticated} = useSelector((store)=>store.auth)
+
+
+    const dispatch = useDispatch()
+    
+    const handleLoginSubmit =  (e) =>{
         e.preventDefault();
+        
+            
+        const userEmail = email
+        const userPassword = password
+        dispatch(authenticateUser( {"email":userEmail,
+                            "password":userPassword} ))
+        
+        
+
+        setEmail('')
+        setPassword('')
+
     }
 
-    const navigate = useNavigate();
+    useEffect(()=>{
+        console.log(isAuthenticated)
+        if(isAuthenticated){
+            navigate(from, {replace:true})
+        }
+    },[isAuthenticated])
 
-    if(redirect){
-        navigate('/')
-    }
+    useEffect(()=>{
+        userRef.current.focus()
+    },[])
+
+    useEffect(()=>{
+        setErrMsg('')
+    },[email, password])
 
     return (
         <>
@@ -34,21 +71,29 @@ function Login(){
                     <div className="row justify-content-center">
                         <div className="col-lg-5">
                             <div className="sign-form">
+
+                                <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} 
+                                aria-live="assertive" >{errMsg}</p>
+
+
                                 <div className="sign-inner">
                                     <div className="sign-logo" id="logo">
-                                        <Link to="/" ><img src={logo} alt=""/></Link>
-                                        <Link to="/" ><img className="logo-inverse" src={darkLogo} alt=""/></Link>
+                                        {/* <Link to="/" ><img src={logo} alt=""/></Link>
+                                        <Link to="/" ><img className="logo-inverse" src={darkLogo} alt=""/></Link> */}
+
+                                        <Link to="/" ><img src="/images/logo.svg" alt=""/></Link>
+                                        <Link to="/" ><img className="logo-inverse" src="/images/dark-logo.svg" alt=""/></Link>
                                     </div>
                                     <div className="form-dt">
                                         <div className="form-inpts checout-address-step">
                                             <form onSubmit={handleLoginSubmit}>
                                                 <div className="form-title"><h6>Sign In</h6></div>
                                                 <div className="form-group pos_rel">
-                                                    <input id="email" name="email" type="text" placeholder="Enter Email" className="form-control lgn_input" required={true} onChange={e => setEmail(e.target.value)} />
+                                                    <input id="email" name="email" type="text" placeholder="Enter Email" className="form-control lgn_input" required={true} value={email} onChange={e => setEmail(e.target.value)} ref={userRef} />
                                                     <i className="uil uil-envelope lgn_icon"></i>
                                                 </div>
                                                 <div className="form-group pos_rel">
-                                                    <input id="password" name="password" type="password" placeholder="Enter Password" className="form-control lgn_input" required={true} onChange={e=>setPassword(e.target.value)} />
+                                                    <input id="password" name="password" type="password" placeholder="Enter Password" className="form-control lgn_input" required={true} value={password} onChange={e=>setPassword(e.target.value)} />
                                                     <i className="uil uil-padlock lgn_icon"></i>
                                                 </div>
                                                 <button className="login-btn hover-btn" type="submit">Sign In Now</button>

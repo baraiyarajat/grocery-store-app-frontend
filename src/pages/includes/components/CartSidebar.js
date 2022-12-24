@@ -1,5 +1,5 @@
 import { Modal, Button } from "react-bootstrap";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 import { decreaseCartItemQuantity, deleteCartItem, getCartItems, increaseCartItemQuantity, setCartTotal, setFinalCartTotal, setSavings } from '../../../store/cart/cartSlice';
@@ -10,8 +10,6 @@ import {DashIcon, PlusIcon} from '@primer/octicons-react'
 
 
 function CartItem({cartProduct, setShowCartModal}){
-
-    const imageUrl = `http://127.0.0.1:8000${cartProduct.warehouse_product.product.image}`
 
     const dispatch = useDispatch()
 
@@ -53,7 +51,7 @@ function CartItem({cartProduct, setShowCartModal}){
         <div className="cart-item">
             <Link onClick={(e)=>handleProductNavigate(e)} >
                 <div className="cart-product-img">
-                    <img src={imageUrl} alt="product_image"/>
+                    <img src={cartProduct.warehouse_product.product.image} alt="product_image"/>
                     {cartProduct.warehouse_product.discount_rate>0   && <div className="offer-badge">{cartProduct.warehouse_product.discount_rate}% OFF</div>}
                 </div>
             </Link>
@@ -67,8 +65,8 @@ function CartItem({cartProduct, setShowCartModal}){
                         &nbsp;{cartProduct.quantity}&nbsp;
                         <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleIncreaseItemQuantity(e)}><PlusIcon size={10} /></button>
                     </div>
-                    {cartProduct.warehouse_product.discount_rate>0 &&  <div className="cart-item-price">${Math.round((cartProduct.warehouse_product.get_discounted_price * cartProduct.quantity)*100)/100}<span>${cartProduct.warehouse_product.price * cartProduct.quantity}</span></div>}
-                    {cartProduct.warehouse_product.discount_rate===0 &&  <div className="cart-item-price">${Math.round((cartProduct.warehouse_product.price * cartProduct.quantity)*100)/100}</div>}
+                    {cartProduct.warehouse_product.discount_rate>0 &&  <div className="cart-item-price">${(cartProduct.warehouse_product.get_discounted_price * cartProduct.quantity).toFixed(2)}<span>${(cartProduct.warehouse_product.price * cartProduct.quantity).toFixed(2)}</span></div>}
+                    {cartProduct.warehouse_product.discount_rate===0 &&  <div className="cart-item-price">${(cartProduct.warehouse_product.price * cartProduct.quantity).toFixed(2)}</div>}
                 </div>}
 
                 {cartProduct.warehouse_product.stock==0 && <div> Out of stock  </div>}	
@@ -141,12 +139,12 @@ function CartSidebar({showCartModal, setShowCartModal}){
             <Modal.Title id="cart-modal-footer">
                 <div class="cart-total-dil saving-total ">
                     <h4>Total Saving</h4>
-                    <span>${savings}</span>
+                    <span>${savings.toFixed(2)}</span>
                 </div>
 
                 <div class="main-total-cart">
                     <h2>Total</h2>
-                    <span>${finalCartTotal}</span>
+                    <span>${finalCartTotal.toFixed(2)}</span>
                 </div>
 
                 <div class="checkout-cart">

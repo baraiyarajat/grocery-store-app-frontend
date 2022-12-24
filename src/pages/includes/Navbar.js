@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 //Components
 import CartSidebar from "./components/CartSidebar";
@@ -7,15 +7,15 @@ import SearchModel from "./components/SearchModel";
 import CategoryModel from "./components/CategoryModel";
 
 //Images
-import darkLogo1 from '../../assets/images/dark-logo-1.svg'
-import logo from '../../assets/images/logo.svg'
-import darkLogo from '../../assets/images/dark-logo.svg'
-import img5 from '../../assets/images/avatar/img-5.jpg'
+// import darkLogo1 from '../../assets/images/dark-logo-1.svg'
+// import logo from '../../assets/images/logo.svg'
+// import darkLogo from '../../assets/images/dark-logo.svg'
+// import img5 from '../../assets/images/avatar/img-5.jpg'
 
 import Dropdown from 'react-bootstrap/Dropdown';
 
 
-import { fetchUser } from "../../store/user/userSlice";
+import { getUserData } from "../../store/user/userSlice";
 import { getWarehouses } from "../../store/warehouse/warehouseSlice";
 import { getSelectedWarehouse, setSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
 import {useDispatch, useSelector} from 'react-redux'
@@ -24,6 +24,7 @@ import { getWishlist } from "../../store/wishlist/wishlistSlice";
 
 import { Modal, Button } from "react-bootstrap";
 import { getCartItems } from "../../store/cart/cartSlice";
+import { getSearchResults, setSearchString } from "../../store/searchResults/searchResultsSlice";
 
 
 function GuestUserItems(){
@@ -39,11 +40,11 @@ function GuestUserItems(){
 }
 
 
-function Logout(){
-    return (<>
-        <Dropdown.Item ><i className="uil uil-lock-alt icon__1" ></i>Logout</Dropdown.Item>
-    </>)
-}
+// function Logout(){
+//     return (<>
+//         <Dropdown.Item ><i className="uil uil-lock-alt icon__1" ></i>Logout</Dropdown.Item>
+//     </>)
+// }
 
 
 
@@ -51,12 +52,17 @@ function UserAuthenticatedItems({user}){
 
     const { wishlistProducts, isWishlistLoading } = useSelector((store)=>store.wishlist) 
     const {warehouse} = useSelector((store)=>store.selectedWarehouse)
+    
 
     const dispatch = useDispatch()
+
 
     useEffect(()=>{
        dispatch(getWishlist())
     },[dispatch, warehouse])
+
+    
+   
 
     // console.log(wishlistProducts)
 
@@ -70,7 +76,8 @@ function UserAuthenticatedItems({user}){
             <li className="ui dropdown"> 
                 <Dropdown className="opts_account btn" >
                     <Dropdown.Toggle  variant="">
-                        <img src={img5} alt=""/>
+                        {/* <img src={img5} alt=""/> */}
+                        <img src={'/images/avatar/img-5.jpg'} alt=""/>
                         <span className="user__name">{user.first_name} {user.last_name}</span>
                     </Dropdown.Toggle>
                     
@@ -82,7 +89,7 @@ function UserAuthenticatedItems({user}){
                         <Dropdown.Item href="/address" className="btn btn-light item channel_item"><i className="uil uil-location-point icon__1"></i>My Address</Dropdown.Item>								
                         <Dropdown.Item href="/offers" className="btn btn-light item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
                         <Dropdown.Item href="/faq" className="btn btn-light item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								
-                        <Logout/>
+                        <Dropdown.Item href="/logout"><i className="uil uil-lock-alt icon__1"></i>Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </li>
@@ -93,12 +100,26 @@ function UserAuthenticatedItems({user}){
 
 
 
-function LocationDropDownItem({warehouse}){
+function LocationDropDownItem({warehouse, searchString}){
 
     const dispatch = useDispatch()
 
+
+    const handleWarehouseChange = async (e) =>{
+        e.preventDefault()
+        
+        await Promise.all(
+            [dispatch(setSelectedWarehouse(warehouse.id)),]
+        ) 
+
+        return dispatch(getSearchResults(searchString))
+
+
+
+    }
+
     return(
-        <Dropdown.Item className="item channel_item" onClick={()=>dispatch(setSelectedWarehouse(warehouse.id))}>
+        <Dropdown.Item className="item channel_item" onClick={(e)=>handleWarehouseChange(e)}>
             <i className="uil uil-location-point"></i>
             {warehouse.name}
         </Dropdown.Item>
@@ -121,17 +142,32 @@ function Navbar(){
     const handleCartModalClose = () => setShowCartModal(false)
     const handleCartModalShow = () => setShowCartModal(true);
 
-    const dispatch = useDispatch();
-    const {user, isAuthenticated} = useSelector((store)=>store.user)
+    
+    // const {user} = useSelector((store)=>store.user)
+    const {isAuthenticated} = useSelector((store)=>store.auth)
     const selectedWarehouse= useSelector((store)=>store.selectedWarehouse)
     const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
     const {cartItems, isCartLoading} = useSelector((state)=>state.cart)
+    const {user} = useSelector((store)=>store.user)    
+    // const [searchString, setSearchString] = useState('')
+    const {searchString} = useSelector((state)=>state.searchResults)
 
 
-    //get authenticated user if any
-    useEffect(()=>{
-        dispatch(fetchUser())
-    },[dispatch])
+    const navigate = useNavigate()
+    const dispatch = useDispatch();
+
+    const searchForProducts = (e) =>{
+        e.preventDefault()
+        if(searchString.trim()!==''){
+            dispatch(getSearchResults(searchString))
+            navigate('/search-results')
+        }
+    }
+
+
+     useEffect(()=>{
+        dispatch(getUserData())
+    },[])
 
     
      useEffect(()=>{
@@ -140,6 +176,7 @@ function Navbar(){
 
 
     useEffect(()=>{
+        
         dispatch(getSelectedWarehouse())
     },[dispatch])
 
@@ -174,11 +211,14 @@ function Navbar(){
                 <div className="top-header-group">
                     <div className="top-header">
                         <div className="res_main_logo">
-                            <Link to="/" ><img src={darkLogo1} alt=""/></Link>
+                            {/* <Link to="/" ><img src={darkLogo1} alt=""/></Link> */}
+                            <Link to="/" ><img src="/images/dark-logo-1.svg" alt=""/></Link>
                         </div>
                         <div className="main_logo" id="logo">
-                            <Link to="/" ><img src={logo} alt=""/></Link>
-                            <Link to="/" ><img className="logo-inverse" src={darkLogo} alt=""/></Link>
+                            {/* <Link to="/" ><img src={logo} alt=""/></Link>
+                            <Link to="/" ><img className="logo-inverse" src={darkLogo} alt=""/></Link> */}
+                            <Link to="/" ><img src="/images/logo.svg" alt=""/></Link>
+                            <Link to="/" ><img className="logo-inverse" src="/images/dark-logo.svg" alt=""/></Link>
                         </div>
 
                         <Dropdown  id="dropdown-basic" className="select_location" >
@@ -191,7 +231,7 @@ function Navbar(){
 
                             {!isLoading &&  <Dropdown.Menu className="menu dropdown_loc" >
                                     {warehouses.map((warehouse)=>{
-                                            return <LocationDropDownItem key={warehouse.id} warehouse={warehouse} />
+                                            return <LocationDropDownItem key={warehouse.id} warehouse={warehouse} searchString={searchString} />
                                         })}
 
                             </Dropdown.Menu>}
@@ -200,9 +240,10 @@ function Navbar(){
                         <div className="search120">
                             <div className="ui search">
                             <div className="ui left icon input swdh10">
-                                <input className="prompt srch10" type="text" placeholder="Search for products.."/>
+                                <input className="prompt srch10" type="text" placeholder="Search for products.." onChange={e => dispatch(setSearchString(e.target.value.trim()))} value={searchString} />
                                 
-                                <Link to="/product-search" className="btn btn-light" ><i className='uil uil-search-alt icon icon1'></i>  </Link>
+                                <button onClick={searchForProducts} className="btn btn-light" ><i className='uil uil-search-alt icon icon1'></i>  </button>
+                                
                             </div>
                                 
                             </div>
@@ -241,7 +282,8 @@ function Navbar(){
                                         {window.location.pathname!=="/"  &&<li className="nav-item"><Link to="/" className="nav-link" title="Home">Home</Link></li>}
                                         {window.location.pathname==="/new-products" &&  <li className="nav-item"><Link to="/new-products" className="nav-link active" title="New Products">New Products</Link></li>}
                                         {window.location.pathname!=="/new-products" &&  <li className="nav-item"><Link to="/new-products" className="nav-link new_item" title="New Products">New Products</Link></li>}
-                                        <li className="nav-item"><Link to="shop_grid.html" className="nav-link" title="Featured Products">Featured Products</Link></li>
+                                        {window.location.pathname==="/featured-products" &&  <li className="nav-item"><Link to="/featured-products" className="nav-link active" title="Featured Products">Featured Products</Link></li>}
+                                        {window.location.pathname!=="/featured-products" &&  <li className="nav-item"><Link to="/featured-products" className="nav-link new_item" title="Featured Products">Featured Products</Link></li>}
                                         {/* <li className="nav-item"> */}
 
                                             {/* <Dropdown>

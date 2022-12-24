@@ -1,20 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../api/axios";
 
 const initialWishlistState = {
     wishlistProducts: [],
     isWishlistLoading: true
 }
 
-const wishlistUrl = 'http://127.0.0.1:8000/api/v0/wishlist/'
+// const wishlistUrl = 'http://127.0.0.1:8000/api/v0/wishlist/'
+const wishlistUrl = '/api/v0/wishlist/'
 
 export const getWishlist = createAsyncThunk(
     'wishlist/getWishlist',
     async (name,thunkAPI) =>{
-        try{
-            
+        try{            
             const userId = thunkAPI.getState().user.user.id
+
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
             const resp = await axios.get(wishlistUrl, {params :{'user_id':userId, 'warehouse_id':selectedWarehouseId}})
             return resp.data
@@ -40,14 +42,17 @@ export const deleteWishlistProduct = createAsyncThunk(
     }
 )
 
-const addProductToWishlistUrl = "http://127.0.0.1:8000/api/v0/wishlist/add-product-to-wishlist/"
+// const addProductToWishlistUrl = "http://127.0.0.1:8000/api/v0/wishlist/add-product-to-wishlist/"
+const addProductToWishlistUrl = "/api/v0/wishlist/add-product-to-wishlist/"
 
 export const addWishlistProduct = createAsyncThunk(
     'wishlist/addWishlistProduct',
     async(warehouse_product_id,thunkAPI) =>{
         try{
+            
             const userId = thunkAPI.getState().user.user.id
             const resp = await axios.put(addProductToWishlistUrl, {'user_id':userId, 'warehouse_product_id':warehouse_product_id})
+            
             return (await resp).data
         }catch{
             return thunkAPI.rejectWithValue("Not able to add wishlist product")
@@ -78,7 +83,7 @@ const wishlistSlice = createSlice({
         }).addCase(deleteWishlistProduct.rejected, (state)=>{
             state.isWishlistLoading = false
         }).addCase(addWishlistProduct.pending,(state)=>{
-            // state.isWishlistLoading = true
+            state.isWishlistLoading = true
         }).addCase(addWishlistProduct.fulfilled,(state,action)=>{
             state.isWishlistLoading = false
             
@@ -86,10 +91,10 @@ const wishlistSlice = createSlice({
                 return wishlistProduct.id === action.payload.id
             }).length > 0
 
+
             if(!wishlistProductExists){
                 state.wishlistProducts.push(action.payload)
             }
-            
             
 
         }).addCase(addWishlistProduct.rejected,(state)=>{

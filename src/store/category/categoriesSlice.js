@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+// import axios from "axios";
+import axios from "../../api/axios";
 
 
 const initialCategoriesState = {
@@ -8,7 +9,8 @@ const initialCategoriesState = {
 }
 
 
-const categoriesUrl = "http://127.0.0.1:8000/api/v0/categories/"
+// const categoriesUrl = "http://127.0.0.1:8000/api/v0/categories/"
+const categoriesUrl = "/api/v0/categories/"
 
 
 export const getCategories = createAsyncThunk(

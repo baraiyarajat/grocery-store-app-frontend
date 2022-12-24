@@ -1,6 +1,6 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
-import {BrowserRouter as Router, Route,Routes} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 
 // Asset Imports
 // Stylesheets
@@ -10,6 +10,7 @@ import './assets/css/responsive.css';
 import './assets/css/night-mode.css';
 import './assets/css/step-wizard.css';
 import './assets/css/cartmodal.css'
+
 
 // // Vendor Stylesheets
 import './assets/vendor/fontawesome-free/css/all.min.css';
@@ -35,8 +36,11 @@ import Rewards from './pages/rewards';
 import ProductsByCategory from './pages/productsByCategory';
 import SingleProduct from './pages/singleProduct';
 import NewProducts from './pages/newProducts';
+import FeaturedProducts from './pages/featuredProducts';
+import SearchResults from './pages/searchResults';
 
-
+import RequireAuth from './pages/RequireAuth';
+import Logout from './pages/logout';
 
 
 
@@ -44,19 +48,29 @@ function App() {
   return (<>
     <Router>
       <Routes>
-        <Route path='/' element={<Home/>} ></Route>
+        {/* Public Routes */}
         <Route path='/register' element={<Register/>} ></Route>
         <Route path='/login' element={<Login/>} ></Route>
-        <Route path='/dashboard' element={<Dashboard/>} ></Route>
-        <Route path='/wishlist' element={<Wishlist/>} ></Route>
-        <Route path='/orders' element={<Orders/>} ></Route>
-        <Route path='/wallet' element={<Wallet/>} ></Route>
-        <Route path='/address' element={<Address/>} ></Route>        
-        <Route path='/rewards' element={<Rewards/>} ></Route>
+        <Route path='/logout' element={<Logout/>} ></Route>
+        <Route path='/' element={<Home/>} ></Route>
         <Route path='/new-products' element={<NewProducts/>}></Route>
-        <Route path='/checkout' element={<Checkout/>}></Route>
+        <Route path='/featured-products' element={<FeaturedProducts/>}></Route>
+        <Route path='/search-results' element={<SearchResults/>}></Route>
         <Route path='/products-by-category/:categorySlug' element={<ProductsByCategory/>} ></Route>
         <Route path='/products/:productSlug' element={<SingleProduct/>}  ></Route>
+        
+
+        {/* Protected Routes */}
+        <Route element={<RequireAuth/>}>
+          <Route path='/dashboard' element={<Dashboard/>} ></Route>
+          <Route path='/wishlist' element={<Wishlist/>} ></Route>
+          <Route path='/orders' element={<Orders/>} ></Route>
+          <Route path='/wallet' element={<Wallet/>} ></Route>
+          <Route path='/address' element={<Address/>} ></Route>        
+          <Route path='/rewards' element={<Rewards/>} ></Route>
+          <Route path='/checkout' element={<Checkout/>}></Route>
+        </Route>
+
         <Route path='*' element={<Error/>} ></Route>
       </Routes>
     </Router>
