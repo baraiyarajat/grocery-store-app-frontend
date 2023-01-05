@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-// import axios from "axios";
 import axios from '../../api/axios'
 
 
@@ -9,7 +8,6 @@ const initialWarehouseState = {
 }
 
 
-// const getWarehousesUrl = 'http://127.0.0.1:8000/api/v0/warehouses/'
 const getWarehousesUrl = '/api/v0/warehouses/'
 
 export const getWarehouses = createAsyncThunk(

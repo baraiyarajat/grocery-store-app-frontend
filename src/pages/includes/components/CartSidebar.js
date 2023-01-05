@@ -44,7 +44,7 @@ function CartItem({cartProduct, setShowCartModal}){
     const handleProductNavigate = (e) =>{
         e.preventDefault()
         setShowCartModal(false)
-        navigate(`/products/${cartProduct.warehouse_product.product.slug}`)
+        navigate(`/products?name=${cartProduct.warehouse_product.product.slug}`)
     }
 
     return(
@@ -63,7 +63,8 @@ function CartItem({cartProduct, setShowCartModal}){
                     <div className="quantity buttons_added">
                         <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleDecreaseItemQuantity(e)} ><DashIcon size={10} /></button>
                         &nbsp;{cartProduct.quantity}&nbsp;
-                        <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleIncreaseItemQuantity(e)}><PlusIcon size={10} /></button>
+                        {cartProduct.quantity<10 &&  <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleIncreaseItemQuantity(e)}><PlusIcon size={10} /></button>}
+                        {cartProduct.quantity>=10 &&  <button type="button" className='btn btn-secondary btn-sm'  onClick={(e)=>handleIncreaseItemQuantity(e)} disabled><PlusIcon size={10} /></button>}
                     </div>
                     {cartProduct.warehouse_product.discount_rate>0 &&  <div className="cart-item-price">${(cartProduct.warehouse_product.get_discounted_price * cartProduct.quantity).toFixed(2)}<span>${(cartProduct.warehouse_product.price * cartProduct.quantity).toFixed(2)}</span></div>}
                     {cartProduct.warehouse_product.discount_rate===0 &&  <div className="cart-item-price">${(cartProduct.warehouse_product.price * cartProduct.quantity).toFixed(2)}</div>}
@@ -80,10 +81,10 @@ function CartSidebar({showCartModal, setShowCartModal}){
  
     const {cartItems, isCartLoading, cartTotal, savings, finalCartTotal, deliveryCharge} = useSelector((store)=>store.cart)
     const {warehouse, isLoading} = useSelector((store)=>store.selectedWarehouse)
-
+    
     const dispatch = useDispatch()
 
-    useEffect(()=>{
+    useEffect(()=>{        
         dispatch(getCartItems())
     },[dispatch,warehouse])
 
@@ -148,7 +149,7 @@ function CartSidebar({showCartModal, setShowCartModal}){
                 </div>
 
                 <div class="checkout-cart">
-                    <Link to="/" class="promo-code">Have a promocode?</Link>
+                    <Link to="/" class="promo-code" style={{ 'pointer-events' : 'none'}}>Have a promocode?</Link>
                     <Button onClick={(e)=>handleCheckout(e)} className="cart-checkout-btn hover-btn btn-secondary" >Proceed to Checkout</Button>
                 </div>
             </Modal.Title>

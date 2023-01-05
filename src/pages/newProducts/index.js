@@ -10,6 +10,7 @@ import { addWishlistProduct, deleteWishlistProduct } from "../../store/wishlist/
 
 import Footer from "../includes/Footer";
 import Navbar from "../includes/Navbar";
+import EmptyProductMessage from "../includes/EmptyProductMessage";
 
 
 function NewProductItem(params){
@@ -46,14 +47,11 @@ function NewProductItem(params){
 
     }
 
-
-    // const imageUrl = `http://127.0.0.1:8000${params.product.product.image}`
-
-
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
-                <Link to={`/products/${params.product.product.slug}`} className="product-img">
+                {/* <Link to={`/products/${params.product.product.slug}`} className="product-img"> */}
+                <Link to={`/products?name=${params.product.product.slug}`} className="product-img">
                     <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
@@ -71,9 +69,10 @@ function NewProductItem(params){
                     <Link to={`/products/${params.product.product.slug}`}><h4>{params.product.product.name}</h4></Link>
                     { params.product.discount_rate!==0 &&  <div className="product-price">${params.product.get_discounted_price} <span>${params.product.price}</span></div>}
                     { params.product.discount_rate===0 &&  <div className="product-price">${params.product.price} </div>}
+                    {params.product.stock===0 &&  <button className="btn btn-light disabled"  disabled={true} type="button">Add to Cart</button>}
                     {!params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light" type="button" onClick={(e)=>addToCartHandler(e)}>Add to Cart</button>}
                     {params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light" type="button" onClick={(e)=>deleteFromCartHandler(e)} >Remove from Cart</button>}
-                    {params.product.stock===0 &&  <button className="btn btn-light disabled"  disabled={true} type="button">Add to Cart</button>}
+                    
                     
                 </div>
             </div>
@@ -89,19 +88,20 @@ function NewProducts(){
     const {warehouse} = useSelector((store)=>store.selectedWarehouse)
     const {newProducts, isNewProductsLoading} = useSelector((store)=>store.newProducts)
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
-    const {cartItems, isCartLoading} = useSelector((store)=>store.cart)   
+    const {cartItems, isCartLoading} = useSelector((store)=>store.cart) 
+    const {isAuthenticated} = useSelector((store)=>store.auth)  
 
     useEffect(()=>{
         dispatch(getNewWarehouseProducts())
     },[warehouse, dispatch])
 
-    useEffect(()=>{
-        dispatch(getWishlist())
-    },[warehouse, dispatch])
+    // useEffect(()=>{
+    //     isAuthenticated && dispatch(getWishlist())
+    // },[warehouse, isAuthenticated, dispatch])
 
-    useEffect(()=>{
-        dispatch(getCartItems())
-    },[warehouse, dispatch])
+    // useEffect(()=>{
+    //     isAuthenticated && dispatch(getCartItems())
+    // },[warehouse, isAuthenticated, dispatch])
 
 
 
@@ -126,7 +126,7 @@ function NewProducts(){
                     </div>
 
 
-                    <div className="all-product-grid">
+                    {newProducts.length >0 &&  <div className="all-product-grid">
                         <div className="container">
                             <div className="row">
                                 <div className="col-lg-12">
@@ -147,6 +147,8 @@ function NewProducts(){
                                         })[0]
                                         const inWishlist = wishlistProduct && true
                                         
+                                        
+
                                         const cartProduct = cartItems.filter((item)=>{
                                             return item.warehouse_product.id === productId
                                         })[0]
@@ -157,7 +159,9 @@ function NewProducts(){
                                 </div>}
                             </div>
                         </div>
-                    </div>
+                    </div>}
+
+                    {!isNewProductsLoading && newProducts.length ===0 && <EmptyProductMessage/>}
 
 
                 </div>

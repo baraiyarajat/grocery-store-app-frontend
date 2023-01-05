@@ -1,12 +1,8 @@
 import React from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-// Images
-// import logo from '../../assets/images/logo.svg'
-// import darkLogo from '../../assets/images/dark-logo.svg'
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { authenticateUser, userLogin } from "../../store/auth/authSlice";
 import { useRef } from "react";
@@ -15,12 +11,16 @@ import { useEffect } from "react";
 
 function Login(){
 
+    const [searchParams, setSearchParams] = useSearchParams();
     const userRef = useRef();
     const errRef = useRef();
     const navigate = useNavigate();
     const location = useLocation();
+    const nextLocation  = searchParams.get('next') || "/"
     const from = location.state?.from?.pathname || "/";
-
+    
+    
+    
     
 
     const [email, setEmail] = useState("");
@@ -50,9 +50,14 @@ function Login(){
     }
 
     useEffect(()=>{
-        console.log(isAuthenticated)
+        // console.log(isAuthenticated)
         if(isAuthenticated){
-            navigate(from, {replace:true})
+            if(from!=="/"){
+                navigate(from, {replace:true})
+            }else{
+                navigate(nextLocation, {replace:true})
+            }
+            
         }
     },[isAuthenticated])
 

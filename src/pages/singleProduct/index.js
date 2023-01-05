@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Navbar from "../includes/Navbar";
 import Footer from "../includes/Footer";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,11 +7,15 @@ import { getSingleProduct } from "../../store/singleProduct/singleProductSlice";
 import { Link } from "react-router-dom";
 import { addWishlistProduct, deleteWishlistProduct, getWishlist } from "../../store/wishlist/wishlistSlice";
 import { addCartItem, deleteCartItem, getCartItems } from "../../store/cart/cartSlice";
+import { getSelectedWarehouse } from "../../store/warehouse/selectedWarehouseSlice";
 
 function SingleProduct (){
 
     const params = useParams();
-    const productSlug = params.productSlug
+    // const productSlug = params.productSlug
+    const [searchParams, setSearchParams] = useSearchParams();
+    const productSlug = searchParams.get('name')
+
     
     const [cartObject, setCartObject] = useState({"inCart":false,
                                                    "cartItemId":null})
@@ -25,25 +29,7 @@ function SingleProduct (){
 
     const dispatch = useDispatch()
 
-    useEffect(()=>{
-        dispatch(getSingleProduct(productSlug))
-    },[warehouse, productSlug, dispatch])
-
-    useEffect(()=>{
-        dispatch(getCartItems())
-    },[warehouse,dispatch, productSlug])
-
-    useEffect(()=>{
-       const cartItem =  cartItems.filter((item)=>{return item.warehouse_product.id === singleProduct.id})[0]
-       if(cartItem){
-        setCartObject({"inCart":true,
-                        "cartItemId":cartItem.id})
-       } else{
-        setCartObject({"inCart":false,
-                        "cartItemId":null})
-       }
-
-    },[warehouse,singleProduct, cartItems,dispatch])
+    
 
     const wishlistProduct = wishlistProducts.filter((wishlistProduct)=>{
                                 return wishlistProduct.warehouse_product.id === singleProduct.id 
@@ -81,8 +67,28 @@ function SingleProduct (){
 
     }
 
-    
-    
+
+    useEffect(()=>{        
+        
+        dispatch(getSingleProduct(productSlug))
+    },[warehouse, productSlug, dispatch])
+
+    useEffect(()=>{
+        dispatch(getCartItems())
+    },[warehouse,dispatch, productSlug])
+
+    useEffect(()=>{
+       const cartItem =  cartItems.filter((item)=>{return item.warehouse_product.id === singleProduct.id})[0]
+       if(cartItem){
+        setCartObject({"inCart":true,
+                        "cartItemId":cartItem.id})
+       } else{
+        setCartObject({"inCart":false,
+                        "cartItemId":null})
+       }
+
+    },[warehouse,singleProduct, cartItems,dispatch])
+
 
     return (
         <>
@@ -96,8 +102,8 @@ function SingleProduct (){
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb">
                                             <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-                                            {!isSingleProductLoading &&  <li className="breadcrumb-item"><Link to={`/products-by-category/${singleProduct.product.category.slug}`}>{singleProduct.product.category.name}</Link></li>}
-                                            {!isSingleProductLoading && <li className="breadcrumb-item active" aria-current="page">{singleProduct.product.name}</li>}
+                                            {!isLoading && !isSingleProductLoading &&  <li className="breadcrumb-item"><Link to={`/products-by-category?name=${singleProduct.product.category.slug}`}>{singleProduct.product.category.name}</Link></li>}
+                                            {!isLoading && !isSingleProductLoading && <li className="breadcrumb-item active" aria-current="page">{singleProduct.product.name}</li>}
                                         </ol>
                                     </nav>
                                 </div>
@@ -111,32 +117,32 @@ function SingleProduct (){
                                     <div className="product-dt-view">
                                         <div className="row">
                                             <div className="col-lg-4 col-md-4">
-                                               {!isSingleProductLoading && <img src={singleProduct.product.image} width="380" height="380" alt=""/>}
+                                               {!isLoading && !isSingleProductLoading && <img src={singleProduct.product.image} width="380" height="380" alt=""/>}
                                             </div>
                                             <div className="col-lg-8 col-md-8">
                                                 <div className="product-dt-right">
-                                                    {!isSingleProductLoading &&  <h2>{singleProduct.product.name}</h2>}
+                                                    {!isLoading && !isSingleProductLoading &&  <h2>{singleProduct.product.name}</h2>}
                                                     <div className="no-stock">
-                                                        {singleProduct.stock>0 &&  <p className="stock-qty">Available<span>(In stock)</span></p>}
-                                                        {!singleProduct.stock>0 &&  <p className="stock-qty">Unavailable<span>(Out of stock)</span></p>}
+                                                        {!isLoading && singleProduct.stock>0 &&  <p className="stock-qty">Available<span>(In stock)</span></p>}
+                                                        {!isLoading && !singleProduct.stock>0 &&  <p className="stock-qty">Unavailable<span>(Out of stock)</span></p>}
                                                     </div>
                                                     
-                                                    {!isSingleProductLoading && <p className="pp-descp">{singleProduct.product.description}</p>}
+                                                    {!isLoading && !isSingleProductLoading && <p className="pp-descp">{singleProduct.product.description}</p>}
                                                     <div className="product-group-dt">
                                                         <ul>
-                                                            {singleProduct.discount_rate>0 &&  <li><div className="main-price color-discount">Discount Price<span>${singleProduct.get_discounted_price}</span></div></li>}
-                                                            {singleProduct.discount_rate>0 &&  <li><div className="main-price mrp-price">MRP Price<span>${singleProduct.price}</span></div></li>}
-                                                            {!singleProduct.discount_rate>0 && <li><div className="main-price "> Price<span>${singleProduct.price}</span></div></li>}
+                                                            {!isLoading && singleProduct.discount_rate>0 &&  <li><div className="main-price color-discount">Discount Price<span>${singleProduct.get_discounted_price}</span></div></li>}
+                                                            {!isLoading && singleProduct.discount_rate>0 &&  <li><div className="main-price mrp-price">MRP Price<span>${singleProduct.price}</span></div></li>}
+                                                            {!isLoading && !singleProduct.discount_rate>0 && <li><div className="main-price "> Price<span>${singleProduct.price}</span></div></li>}
                                                         </ul>
                                                         <ul className="gty-wish-share">
                                                             <li>                                                    
-                                                                {!isWishlistLoading &&  !inWishlist && <span className="like-icon save-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
-                                                                {!isWishlistLoading &&   inWishlist && <span className="like-icon save-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}  
+                                                                {!isLoading && !isWishlistLoading &&  !inWishlist && <span className="like-icon save-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                                                                {!isLoading && !isWishlistLoading &&   inWishlist && <span className="like-icon save-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}  
                                                             </li>
                                                         </ul>
                                                         <ul className="ordr-crt-share">
-                                                             {cartObject.inCart && <li><button className="add-cart-btn hover-btn"  onClick={(e)=>deleteFromCartHandler(e)} ><i className="uil uil-shopping-cart-alt"></i>Remove from Cart</button></li>}
-                                                             {!cartObject.inCart  && singleProduct.stock>0 && <li><button className="add-cart-btn hover-btn" onClick={(e)=>addToCartHandler(e)}><i className="uil uil-shopping-cart-alt"></i>Add to Cart</button></li>}                                                      
+                                                             {!isLoading && cartObject.inCart && <li><button className="add-cart-btn hover-btn"  onClick={(e)=>deleteFromCartHandler(e)} ><i className="uil uil-shopping-cart-alt"></i>Remove from Cart</button></li>}
+                                                             {!isLoading && !cartObject.inCart  && singleProduct.stock>0 && <li><button className="add-cart-btn hover-btn" onClick={(e)=>addToCartHandler(e)}><i className="uil uil-shopping-cart-alt"></i>Add to Cart</button></li>}                                                      
                                                         </ul>
                                                     </div>
                                                     <div className="pdp-details">

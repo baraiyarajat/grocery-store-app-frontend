@@ -1,12 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // import axios from "axios";
 import axios from "../../api/axios";
-
+import tokenDecode from 'jwt-decode'
 
 
 const initialUserState = {
     user : "",
+    user_id:"",
     isUserLoading : true
+}
+
+const accessToken = localStorage.getItem('access_token') || null
+
+if(accessToken){
+    const decodedToken = tokenDecode(accessToken)
+    initialUserState.user_id = decodedToken.user_id
 }
 
 // const accountsUrl = "http://127.0.0.1:8000/accounts/"
@@ -42,9 +50,10 @@ const userSlice = createSlice({
     extraReducers:(builder)=>{
         builder.addCase(getUserData.pending,(state)=>{
             state.isUserLoading = true
-        }).addCase(getUserData.fulfilled,(state,action)=>{
+        }).addCase(getUserData.fulfilled,(state,action)=>{            
+            state.user = action.payload            
+            state.user_id = state.user.id
             state.isUserLoading = false
-            state.user = action.payload
         }).addCase(getUserData.rejected,(state)=>{
             state.isUserLoading = false
         })}

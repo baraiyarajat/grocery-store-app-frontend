@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import axios from '../../api/axios'
 import tokenDecode from 'jwt-decode'
 
+
+
 const initialAuthState = {
     isAuthenticationLoading : true,
     isAuthenticated : false
@@ -23,6 +25,8 @@ export const userLogout = createAsyncThunk(
     'auth/userLogout',
     async (name, thunkAPI) =>{
         try{
+            const loggedInUser = thunkAPI.getState().user.user_id
+            updateUserDataOnLogout(loggedInUser)
             const logoutDetails = {'refresh_token': localStorage.getItem('refresh_token')}
             const resp = await axios.post('/accounts/logout',logoutDetails)    
             localStorage.removeItem('refresh_token');
@@ -50,6 +54,40 @@ export const authenticateUser = createAsyncThunk(
     }
 )
 
+
+
+const  updateUserDataOnAuthentication = async() =>{
+
+    //Update selected warehouse
+    const anonymousUserData = JSON.parse(localStorage.getItem('anonymousUserData'))
+    const selectedWarehouse = anonymousUserData.selectedWarehouse
+    const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
+    await axios.post(selectedWarehouseUrl, { user_id:"",  "selected_warehouse_id":selectedWarehouse.warehouse.id})
+
+
+
+    //Delete Set Cookie
+    localStorage.removeItem('anonymousUserData')
+}
+
+const updateUserDataOnLogout = async (loggedInUser)=>{    
+    try{
+        const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
+        const resp = await axios.post(selectedWarehouseUrl, { "user_id":loggedInUser, "selected_warehouse_id":null})        
+        const anonymousUserData = localStorage.getItem('anonymousUserData') || null 
+        if(!anonymousUserData){                
+            localStorage.setItem('anonymousUserData', JSON.stringify({'selectedWarehouse':resp.data}) )        
+        }
+    }catch{
+        
+    }
+    
+
+
+    
+    
+}
+
 const authSlice = createSlice({
     name:'auth',
     initialState:initialAuthState,
@@ -64,6 +102,11 @@ const authSlice = createSlice({
             state.isAuthenticated = true
             localStorage.setItem('refresh_token', action.payload.refresh_token);
             localStorage.setItem('access_token', action.payload.access_token);
+
+            //Move local storage items for the authenticated user
+            updateUserDataOnAuthentication()
+
+
             // state.accessToken = action.payload.access_token
         }).addCase(authenticateUser.rejected,(state)=>{              
             state.isAuthenticationLoading = false
@@ -75,7 +118,8 @@ const authSlice = createSlice({
             state.isAuthenticated = false
         }).addCase(userLogout.fulfilled,(state,action)=>{            
             state.isAuthenticationLoading = false
-            state.isAuthenticated = false           
+            state.isAuthenticated = false                       
+
             // state.accessToken = ""
         }).addCase(userLogout.rejected,(state)=>{            
             // state.isAuthenticationLoading = false

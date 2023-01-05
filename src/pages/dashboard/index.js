@@ -2,20 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 
-//Includes
-import Navbar from '../includes/Navbar';
-import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getWalletDetails } from '../../store/wallet/walletSlice';
 
+//Includes
+import Navbar from '../includes/Navbar';
+import Footer from '../includes/Footer';
+import UserBanner from '../includes/UserBanner';
 
 
 function Dashboard(){
 
 
     const {wallet, isWalletLoading} = useSelector((store)=>store.wallet)
-
+    const {user} = useSelector((store)=>store.user)
     const dispatch = useDispatch()
 
     useEffect(()=>{
@@ -42,26 +43,9 @@ function Dashboard(){
                             </div>
                         </div>
                     </div>
-                    <div className="dashboard-group">
-                        <div className="container">
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <div className="user-dt">
-                                        <div className="user-img">
-                                            <img src="images/avatar/img-5.jpg" alt=""/>
-                                            <div className="img-add">
-                                                <input type="file" id="file"/>
-                                                <label htmlFor="file"><i className="uil uil-camera-plus"></i></label>
-                                            </div>
-                                        </div>
-                                        <h4>Johe Doe</h4>
-                                        <p>+91999999999<a href="#"><i className="uil uil-edit"></i></a></p>
-                                        <div className="earn-points"><img src="images/Dollar.svg" alt=""/>Points : <span>20</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>	
+                   
+                    <UserBanner/>
+
                     <div className="">
                         <div className="container">
                             <div className="row">
@@ -86,7 +70,7 @@ function Dashboard(){
                                                     <h4><i className="uil uil-apps"></i>Overview</h4>
                                                 </div>
                                                 <div className="welcome-text">
-                                                    <h2>Hi! John Doe</h2>
+                                                    <h2>Hi! {user.first_name} {user.last_name}</h2>
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 col-md-12">
@@ -98,7 +82,7 @@ function Dashboard(){
                                                         <h2>6 Rewards</h2>
                                                         <ul>
                                                             <li>
-                                                                <a href="#" className="small-reward-dt hover-btn">Won $2</a>
+                                                                <a href="#" className="small-reward-dt hover-btn disable" >Won $2</a>
                                                             </li>
                                                             <li>
                                                                 <a href="#" className="small-reward-dt hover-btn">Won 40% Off</a>
@@ -107,11 +91,11 @@ function Dashboard(){
                                                                 <a href="#" className="small-reward-dt hover-btn">Caskback $1</a>
                                                             </li>
                                                             <li>
-                                                                <a href="#" className="rewards-link5">+More</a>
+                                                                <Link to="/rewards" className="rewards-link5">+More</Link>
                                                             </li>
                                                         </ul>
                                                     </div>
-                                                    <a href="#" className="more-link14">Rewards and Details <i className="uil uil-angle-double-right"></i></a>
+                                                    <Link to='/rewards' className="more-link14">Rewards and Details <i className="uil uil-angle-double-right"></i></Link>
                                                 </div>
                                             </div>
                                             <div className="col-lg-6 col-md-12">

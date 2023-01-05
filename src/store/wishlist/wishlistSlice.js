@@ -15,8 +15,10 @@ export const getWishlist = createAsyncThunk(
     'wishlist/getWishlist',
     async (name,thunkAPI) =>{
         try{            
-            const userId = thunkAPI.getState().user.user.id
-
+            // const userId = thunkAPI.getState().user.user.id
+            // console.log(thunkAPI.getState().user)
+            const userId = thunkAPI.getState().user.user_id
+            
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
             const resp = await axios.get(wishlistUrl, {params :{'user_id':userId, 'warehouse_id':selectedWarehouseId}})
             return resp.data

@@ -1,6 +1,6 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Routes, useLocation} from 'react-router-dom';
 
 // Asset Imports
 // Stylesheets
@@ -45,23 +45,36 @@ import Logout from './pages/logout';
 
 
 function App() {
+
+  
+
   return (<>
     <Router>
       <Routes>
         {/* Public Routes */}
         <Route path='/register' element={<Register/>} ></Route>
         <Route path='/login' element={<Login/>} ></Route>
-        <Route path='/logout' element={<Logout/>} ></Route>
+        {/* <Route path='/logout' element={<Logout/>} ></Route>
         <Route path='/' element={<Home/>} ></Route>
         <Route path='/new-products' element={<NewProducts/>}></Route>
         <Route path='/featured-products' element={<FeaturedProducts/>}></Route>
-        <Route path='/search-results' element={<SearchResults/>}></Route>
-        <Route path='/products-by-category/:categorySlug' element={<ProductsByCategory/>} ></Route>
-        <Route path='/products/:productSlug' element={<SingleProduct/>}  ></Route>
+        <Route path='/search-results' element={<SearchResults/>}></Route>        
+        <Route path='/products-by-category' element={<ProductsByCategory />} ></Route>        
+        <Route path='/products' element={<SingleProduct/>}  ></Route> */}
         
 
         {/* Protected Routes */}
         <Route element={<RequireAuth/>}>
+
+          <Route path='/logout' element={<Logout/>} ></Route>
+          <Route path='/' element={<Home/>} ></Route>
+          <Route path='/new-products' element={<NewProducts/>}></Route>
+          <Route path='/featured-products' element={<FeaturedProducts/>}></Route>
+          <Route path='/search-results' element={<SearchResults/>}></Route>        
+          <Route path='/products-by-category' element={<ProductsByCategory />} ></Route>        
+          <Route path='/products' element={<SingleProduct/>}  ></Route>
+
+
           <Route path='/dashboard' element={<Dashboard/>} ></Route>
           <Route path='/wishlist' element={<Wishlist/>} ></Route>
           <Route path='/orders' element={<Orders/>} ></Route>
@@ -72,6 +85,7 @@ function App() {
         </Route>
 
         <Route path='*' element={<Error/>} ></Route>
+        {/* <Route path='*' element={<Home/>} ></Route> */}
       </Routes>
     </Router>
   </>

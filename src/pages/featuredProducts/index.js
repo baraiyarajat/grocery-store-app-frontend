@@ -10,6 +10,7 @@ import { addWishlistProduct, deleteWishlistProduct } from "../../store/wishlist/
 
 import Footer from "../includes/Footer";
 import Navbar from "../includes/Navbar";
+import EmptyProductMessage from "../includes/EmptyProductMessage";
 
 
 
@@ -51,7 +52,7 @@ function FeaturedProductItem(params){
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
-                <Link to={`/products/${params.product.product.slug}`} className="product-img">
+                <Link to={`/products?name=${params.product.product.slug}`} className="product-img">
                     <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
@@ -88,18 +89,19 @@ function FeaturedProducts(){
     const {featuredProducts, isFeaturedProductsLoading} = useSelector((store)=>store.featuredProducts)
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
     const {cartItems, isCartLoading} = useSelector((store)=>store.cart)   
+    const {isAuthenticated} = useSelector((store)=>store.auth)
 
     useEffect(()=>{
         dispatch(getFeaturedProducts())
     },[warehouse, dispatch])
 
     useEffect(()=>{
-        dispatch(getWishlist())
-    },[warehouse, dispatch])
+        isAuthenticated && dispatch(getWishlist())
+    },[warehouse,isAuthenticated, dispatch])
 
     useEffect(()=>{
-        dispatch(getCartItems())
-    },[warehouse, dispatch])
+        isAuthenticated && dispatch(getCartItems())
+    },[warehouse, isAuthenticated, dispatch])
 
 
 
@@ -124,7 +126,7 @@ function FeaturedProducts(){
                     </div>
 
 
-                    <div className="all-product-grid">
+                    { featuredProducts.length>0 && <div className="all-product-grid">
                         <div className="container">
                             <div className="row">
                                 <div className="col-lg-12">
@@ -155,7 +157,9 @@ function FeaturedProducts(){
                                 </div>}
                             </div>
                         </div>
-                    </div>
+                    </div>}
+
+                    {!isFeaturedProductsLoading && featuredProducts.length ===0 && <EmptyProductMessage/>}
 
 
                 </div>

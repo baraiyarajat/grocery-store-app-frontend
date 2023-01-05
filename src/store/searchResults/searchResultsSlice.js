@@ -42,7 +42,7 @@ const searchResultsSlice = createSlice({
         }).addCase(getSearchResults.fulfilled, (state, action) => {
             state.searchResults = action.payload;
             state.isSearchResultsLoading = false;
-            console.log(state.searchString)
+            // console.log(state.searchString)
             
             
         }).addCase(getSearchResults.rejected, (state)=>{

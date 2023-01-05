@@ -18,7 +18,8 @@ export const getAddresses = createAsyncThunk(
     async (name, thunkAPI) =>{
         
         
-        const user_id = thunkAPI.getState().user.user.id
+        // const user_id = thunkAPI.getState().user.user.id
+        const user_id = thunkAPI.getState().user.user_id
         try{
             const resp = await axios.get(getAddressesUrl,{ params: { user_id: user_id } })
             return resp.data

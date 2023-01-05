@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import {Link} from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-// import axios from 'axios';
 import axios from '../../api/axios'
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +12,7 @@ import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import {getAddresses, deleteAddress} from '../../store/address/addressSlice'
 import { useState } from 'react';
+import UserBanner from '../includes/UserBanner';
 
 
 
@@ -21,14 +20,7 @@ const capitalizeFirst = str => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-function AddressItem({address, showModal,  setShow, setAddressObject}){
-
-    const {warehouses, isLoading} = useSelector((store)=>store.warehouse)
-    const city = warehouses.filter((warehouse)=>{
-        return warehouse.id === address.city
-    })[0].name
-
-    
+function AddressItem({address, showModal,  setShow, setAddressObject}){  
 
     const getAddressIcon = (address_type) =>{
         if(address_type==='home' || address_type==='Home'){
@@ -49,7 +41,7 @@ function AddressItem({address, showModal,  setShow, setAddressObject}){
                                     address_line_1:address.address_line_1,
                                     address_line_2:address.address_line_2,
                                     pincode:address.pincode,
-                                    city:city,
+                                    city:address.city.name,
                                     address_id:address.id}
         setAddressObject(existingAddressObject)
         
@@ -68,6 +60,7 @@ function AddressItem({address, showModal,  setShow, setAddressObject}){
         return dispatch(getAddresses())
     }
 
+
     return(
         <>
             <div className="address-item">
@@ -76,7 +69,7 @@ function AddressItem({address, showModal,  setShow, setAddressObject}){
                 </div>
                 <div className="address-dt-all">
                     <h4>{capitalizeFirst(address.address_type)}</h4>
-                    <p>{address.address_line_1}, {address.address_line_2}, {city}, {address.pincode} </p>
+                    <p>{address.address_line_1}, {address.address_line_2}, {address.city.name}, {address.pincode} </p>
                     <ul className="action-btns">
                         
                         <li><button className="btn" onClick={()=>handleEditAddress()} ><PencilIcon size={18} /></button></li>
@@ -203,26 +196,9 @@ function Address(){
                             </div>
                         </div>
                     </div>
-                    <div className="dashboard-group">
-                        <div className="container">
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <div className="user-dt">
-                                        <div className="user-img">
-                                            <img src="images/avatar/img-5.jpg" alt=""/>
-                                            <div className="img-add">													
-                                                <input type="file" id="file"/>
-                                                <label htmlFor="file"><i className="uil uil-camera-plus"></i></label>
-                                            </div>
-                                        </div>
-                                        <h4>Johe Doe</h4>
-                                        <p>+91999999999<a href="#"><i className="uil uil-edit"></i></a></p>
-                                        <div className="earn-points"><img src="images/Dollar.svg" alt=""/>Points : <span>20</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>	
+
+                    <UserBanner/>
+                    
                     <div className="">
                         <div className="container">
                             <div className="row">

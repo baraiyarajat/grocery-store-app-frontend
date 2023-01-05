@@ -14,7 +14,7 @@ export const getOrders = createAsyncThunk(
     'order/getOrders',
     async (name, thunkAPI) =>{
         try{
-            const userID = thunkAPI.getState().user.user.id
+            const userID = thunkAPI.getState().user.user_id
             const resp = await axios.get(ordersUrl,{params:{"user_id":userID}})
             return resp.data
 

@@ -19,9 +19,11 @@ export const getSingleProduct = createAsyncThunk(
     'singleProduct/getSingleProduct',
     async (productSlug,thunkAPI)=>{
         try{
-            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
-            const getSingleProductUrl = warehouseProductUrl.concat(productSlug)
+                        
+            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id            
+            const getSingleProductUrl = warehouseProductUrl.concat(productSlug)            
             const resp = await axios.get(getSingleProductUrl, {params:{'warehouse_id':selectedWarehouseId}})
+            
             return resp.data
         }catch{
             return thunkAPI.rejectWithValue('Not able to product');
@@ -40,7 +42,7 @@ const singleProductSlice = createSlice({
             state.isSingleProductLoading = false
             state.singleProduct = action.payload
         }).addCase(getSingleProduct.rejected, (state)=>{
-            state.isSingleProductLoading = false
+            state.isSingleProductLoading = true
         })
     }  
 })

@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { deleteCartItem, emptyCart, getCartItems, setCartTotal, setFinalCartTotal, setSavings } from '../../store/cart/cartSlice';
 import { getAddresses } from '../../store/address/addressSlice';
 import { placeOrder } from '../../store/order/orderSlice';
+import { getWalletDetails } from '../../store/wallet/walletSlice';
 
 
 
@@ -15,6 +16,7 @@ const capitalizeFirst = str => {
 };
 
 function AddressItem({address,city, selectedAddressId, handleSelectedAddressChange}){
+    
 
     const getAddressIcon = (address_type) =>{
         if(address_type==='home' || address_type==='Home'){
@@ -49,8 +51,7 @@ function AddressItem({address,city, selectedAddressId, handleSelectedAddressChan
 
 
 function CheckoutItem({checkoutProduct}){
-
-    // const imageUrl = `http://127.0.0.1:8000${checkoutProduct.warehouse_product.product.image}`
+    
     const dispatch = useDispatch()
 
     const handleDeleteCartItem = async(e) =>{
@@ -138,7 +139,7 @@ const CashOnDeliveryItem = () =>{
                 <div className="col-lg-12">
                     <div className="pymnt_title">
                         <h4>Cash on Delivery</h4>
-                        <p>Cash on Delivery will not be available if your order value exceeds $10.</p>
+                        <p>Cash on Delivery will not be available if your order value exceeds $30.</p>
                     </div>
                 </div>														
             </div>
@@ -223,12 +224,31 @@ const CardPaymentItem = ({cardDetails, handleCardDetailsChange}) =>{
 }
 
 
+const WalletPaymentItem = ({walletDetails}) =>{
+
+     return(
+        <>
+            <div className="row">
+                <div className="col-lg-12">
+                    <div className="pymnt_title">
+                        <h4>Wallet </h4>
+                        <p>Your current wallet balance is <b>${walletDetails.credit}</b>.</p>
+                    </div>
+                </div>														
+            </div>
+        </>
+    )
+
+}
+
+
 function Checkout(){
 
 
     const {cartItems, isCartLoading, cartTotal, savings, finalCartTotal, deliveryCharge} = useSelector((store)=>store.cart)
     const {addresses, isLoading} = useSelector((store)=>store.address)
     const selected_warehouse = useSelector((store)=>store.selectedWarehouse)
+    const {wallet, isWalletLoading} = useSelector((store)=> store.wallet)
     const [paymentMethod, setPaymentMethod] = useState('COD')
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -248,15 +268,13 @@ function Checkout(){
 
 
     // Delivery Date and Time functions and variables
-
     const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' }
 
     const setupDeliveryDatesAndTimes = () =>{
             
             const deliveryDateTimeDict = {}
             const todaysDate = new Date();
-            deliveryDateTimeDict[todaysDate] = setupDeliveryTimes(todaysDate)
-            // setSelectedDeliveryDate(todaysDate)
+            deliveryDateTimeDict[todaysDate] = setupDeliveryTimes(todaysDate)            
 
             for(let day_count = 1 ; day_count<6; day_count ++){
                 let nextDate = new Date(todaysDate.setDate(todaysDate.getDate() + 1) )
@@ -323,7 +341,10 @@ function Checkout(){
     }
 
 
-    
+    const handleAddAddressPress = (e) =>{
+        e.preventDefault()
+        navigate('/address')
+    }
 
     const handleOrderSubmit =  (e) =>{
         e.preventDefault()
@@ -340,12 +361,14 @@ function Checkout(){
             'delivery_fee': deliveryCharge
         }
 
-        console.log(cartTotal)
+        
         
         if(cartItems.length===0){
             console.log("Empty Cart")
         }else if(!selectedAddressId){
             console.log("Please select an address")
+        }else if (deliveryDateAndTimes[deliveryDates[seletedDeliveryDateIndex]].length ===0){
+            console.log("Please select a valid delivery date and time")
         }else if(cartTotal<=12){
             console.log("Cart Total must be greater than 12 dollars")
         }else{
@@ -372,7 +395,7 @@ function Checkout(){
 
     useEffect(()=>{
         dispatch(getAddresses())
-    },[selected_warehouse.warehouse, dispatch])
+    },[selected_warehouse, dispatch])
 
     useEffect(()=>{
         dispatch(setFinalCartTotal())
@@ -383,18 +406,21 @@ function Checkout(){
         
         let city = null
         if(!selected_warehouse.isLoading){
-            city = selected_warehouse.warehouse.warehouse.id
-
-            const filteredAddresses =  addresses.filter((item)=>{
-                return item.city === city
+            city = selected_warehouse.warehouse.warehouse.id            
+            const filteredAddresses =  addresses.filter((item)=>{                
+                return item.city.id === city
             })
-
+            
             if(filteredAddresses.length>0){
                 setSelectedAddressId(filteredAddresses[0].id)
             }
         }
 
     },[selected_warehouse, addresses, dispatch])
+
+    useEffect(()=>{
+        dispatch(getWalletDetails())
+    },[dispatch])
 
 
     return(
@@ -441,13 +467,14 @@ function Checkout(){
                                                                     <p>Please select the delivery address:</p>
                                                                     <div className='row'>
                                                                         {!isLoading && !selected_warehouse.isLoading && addresses.map((address)=>{
-                                                                            if(selected_warehouse.warehouse.warehouse.id === address.city){
+                                                                            if(selected_warehouse.warehouse.warehouse.id === address.city.id){
+                                                                                
                                                                                 return <AddressItem key={address.id} address={address} city={selected_warehouse.warehouse.warehouse} handleSelectedAddressChange={handleSelectedAddressChange} selectedAddressId={selectedAddressId} />
                                                                             }
                                                                             return <></>
                                                                         })}
                                                                         <div className="col-m w-50">
-                                                                            <button className="next-btn16 hover-btn ">Add Address</button>
+                                                                            <button className="next-btn16 hover-btn " onClick={(e)=>handleAddAddressPress(e)}>Add Address</button>
                                                                         </div>
                                                                     </div>	
                                                                 </div>
@@ -520,12 +547,21 @@ function Checkout(){
                                                                                     <label  htmlFor="card1" className="radio-label_1">Credit / Debit Card</label>
                                                                                 </div>
                                                                             </li>
+                                                                            <li>
+                                                                                <div className="radio-item_1">
+                                                                                    <input id="wallet1" value="WALLET" name="paymentmethod" type="radio" data-minimum="50.0" checked={paymentMethod==='WALLET'} onChange={handlePaymentMethodChange} />
+                                                                                    <label  htmlFor="wallet1" className="radio-label_1">Wallet</label>
+                                                                                </div>
+                                                                            </li>
+
                                                                         </ul>
                                                                     </div>
                                                                     
                                                                     {paymentMethod==='COD' &&  <CashOnDeliveryItem/>}
 
                                                                     {paymentMethod==='CARD' &&  <CardPaymentItem cardDetails={cardDetails} handleCardDetailsChange={handleCardDetailsChange} />}
+
+                                                                    {paymentMethod==='WALLET' && <WalletPaymentItem walletDetails={wallet} />}
 
                                                                     <button type='submit' className="next-btn16 hover-btn ">Place Order</button>
                                                                 </div>

@@ -17,7 +17,8 @@ export const getWalletDetails = createAsyncThunk(
     'wallet/getWalletDetails',
     async (name, thunkAPI) =>{
         try{
-            const user_id = thunkAPI.getState().user.user.id
+            // const user_id = thunkAPI.getState().user.user.id
+            const user_id = thunkAPI.getState().user.user_id
             const getWalletDetailsUrl = `${walletUrl}${user_id}`
             const resp = await axios.get(getWalletDetailsUrl)
             return resp.data
@@ -31,7 +32,7 @@ export const addCreditToWallet = createAsyncThunk(
     'wallet/addCreditToWallet',
     async (cardDetails, thunkAPI) =>{
         try{
-            const user_id = thunkAPI.getState().user.user.id
+            const user_id = thunkAPI.getState().user.user_id
             const addCreditUrl = `${walletUrl}add-credit`
             const resp = await axios.patch(addCreditUrl,{"user_id":user_id,
                                                          "card_details":cardDetails})

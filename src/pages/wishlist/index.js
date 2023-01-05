@@ -7,6 +7,7 @@ import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteWishlistProduct, getWishlist } from '../../store/wishlist/wishlistSlice';
 import { addCartItem, deleteCartItem, getCartItems } from '../../store/cart/cartSlice';
+import UserBanner from '../includes/UserBanner';
 
 
 
@@ -43,14 +44,14 @@ function WishlistItem({wishlistProduct, inCart, cartProduct}){
     
     return(
         <div className="cart-item">
-            <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} >
+            <Link to={`/products?name=${wishlistProduct.warehouse_product.product.slug}`} >
                 <div className="cart-product-img">
                     <img src={wishlistProduct.warehouse_product.product.image} height="130" widht="130" alt=""/>
                     { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="offer-badge">{wishlistProduct.warehouse_product.discount_rate}% OFF</div>}
                 </div>
             </Link>
             <div className="cart-text">
-                <Link to={`/products/${wishlistProduct.warehouse_product.product.slug}`} ><h4>{wishlistProduct.warehouse_product.product.name}</h4></Link>
+                <h4><Link to={`/products?name=${wishlistProduct.warehouse_product.product.slug}`} >{wishlistProduct.warehouse_product.product.name}</Link></h4>
                 { wishlistProduct.warehouse_product.discount_rate!==0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.get_discounted_price} <span>${wishlistProduct.warehouse_product.price}</span></div>}
                 { wishlistProduct.warehouse_product.discount_rate===0 && <div className="cart-item-price">${wishlistProduct.warehouse_product.price} </div>}
                  <ul className="ordr-crt-share">
@@ -101,26 +102,8 @@ function Wishlist(){
                             </div>
                         </div>
                     </div>
-                    <div className="dashboard-group">
-                        <div className="container">
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <div className="user-dt">
-                                        <div className="user-img">
-                                            <img src="images/avatar/img-5.jpg" alt=""/>
-                                            <div className="img-add">													
-                                                <input type="file" id="file"/>
-                                                <label htmlFor="file"><i className="uil uil-camera-plus"></i></label>
-                                            </div>
-                                        </div>
-                                        <h4>Johe Doe</h4>
-                                        <p>+91999999999<Link to="#"><i className="uil uil-edit"></i></Link></p>
-                                        <div className="earn-points"><img src="images/Dollar.svg" alt=""/>Points : <span>20</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>	
+                    
+                    <UserBanner/>
                     <div className="">
                         <div className="container">
                             <div className="row">
@@ -150,7 +133,7 @@ function Wishlist(){
                                                     <div className="wishlist-body-dtt">
                                                         
                                                         
-                                                        { !isWishlistLoading && wishlistProducts.map((wishlistProduct)=>{                                                            
+                                                        { wishlistProducts.map((wishlistProduct)=>{                                                            
                                                             const cartProduct = cartItems.filter((item)=>{
                                                                 return item.warehouse_product.id === wishlistProduct.warehouse_product.id
                                                             })[0]

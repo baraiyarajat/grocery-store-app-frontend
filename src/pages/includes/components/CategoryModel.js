@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import ReactDOM from 'react-dom';
 import { useSelector } from 'react-redux';
 import {Link, Navigate, useNavigate} from 'react-router-dom';
 
@@ -11,7 +10,7 @@ function CategoryItem(params){
     const handleModalClick = (e) =>{
         e.preventDefault()
         params.setShowCategoryModal(false)
-        navigate(`/products-by-category/${category.slug}`)
+        navigate(`/products-by-category?name=${category.slug}`)
     }
 
     return(

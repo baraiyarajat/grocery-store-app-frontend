@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Navbar from "../includes/Navbar";
 import Footer from "../includes/Footer";
 import { Link } from "react-router-dom";
@@ -12,6 +12,7 @@ import { DropdownButton } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
 import { setProductsByCategorySortOption } from "../../store/productsByCategory/productsByCategorySortSlice";
 import { addCartItem, deleteCartItem, getCartItems } from "../../store/cart/cartSlice";
+import EmptyProductMessage from "../includes/EmptyProductMessage";
 
 function ProductItem(params){
 
@@ -54,7 +55,8 @@ function ProductItem(params){
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
-                <Link to={`/products/${params.product.product.slug}`} className="product-img">
+                {/* <Link to={`/products/${params.product.product.slug}`} className="product-img"> */}
+                <Link to={`/products?name=${params.product.product.slug}`} className="product-img">
                     <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
@@ -75,14 +77,6 @@ function ProductItem(params){
                     {!params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light hover-btn" type="button" onClick={(e)=>addToCartHandler(e)}>Add to Cart</button>}
                     {params.inCart &&  params.product.stock>0 &&  <button className="btn btn-light hover-btn" type="button" onClick={(e)=>deleteFromCartHandler(e)} >Remove from Cart</button>}
                     {params.product.stock===0 &&  <button className="btn btn-light disabled"  disabled={true} type="button">Add to Cart</button>}
-                    {/* <div className="qty-cart">
-                        <div className="quantity buttons_added">
-                            <input type="button" value="-" className="minus minus-btn"/>
-                            <input type="number" step="1" name="quantity" value="1" className="input-text qty text"/>
-                            <input type="button" value="+" className="plus plus-btn"/>
-                        </div>
-                        <span className="cart-icon"><i className="uil uil-shopping-cart-alt"></i></span>
-                    </div> */}
                 </div>
             </div>
         </div>
@@ -93,8 +87,12 @@ function ProductItem(params){
 
 function ProductsByCategory(){
 
+    const [searchParams, setSearchParams] = useSearchParams();
+    // console.log(searchParams.get('productCategory'))
     const params = useParams();
-    const categorySlug = params.categorySlug
+    // const categorySlug = params.categorySlug
+    // console.log(params)
+    const categorySlug = searchParams.get('name')
     const dispatch = useDispatch()
     const {warehouse} = useSelector((store)=>store.selectedWarehouse)
     const {category, isLoading} = useSelector((store)=>store.category)
@@ -113,14 +111,14 @@ function ProductsByCategory(){
         dispatch(getWarehouseProductsByCategory(categorySlug))
     },[warehouse, category, dispatch, categorySlug])
 
-    useEffect(()=>{
-        dispatch(getWishlist())
-    },[warehouse, category, dispatch])
+    // useEffect(()=>{
+    //     dispatch(getWishlist())
+    // },[warehouse, category, dispatch])
 
 
-    useEffect(()=>{
-        dispatch(getCartItems())
-    },[warehouse, category, dispatch])
+    // useEffect(()=>{
+    //     dispatch(getCartItems())
+    // },[warehouse, category, dispatch])
 
     
     const sortOptionsDict = {}
@@ -163,7 +161,7 @@ function ProductsByCategory(){
                     </div>
 
 
-                    <div className="all-product-grid">
+                    {products.length>0 &&  <div className="all-product-grid">
                         <div className="container">
                             <div className="row">
                                 <div className="col-lg-12">
@@ -203,8 +201,8 @@ function ProductsByCategory(){
                                 </div>}
                             </div>
                         </div>
-                    </div>
-
+                    </div>}
+                    {!isLoading && products.length ===0 && <EmptyProductMessage/> }
 
 
                 </div>

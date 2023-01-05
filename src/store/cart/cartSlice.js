@@ -1,4 +1,3 @@
-// import axios from "axios";
 import axios from "../../api/axios";
 const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit");
 
@@ -15,19 +14,41 @@ const initialCartState = {
     promoCode:{}
 }
 
+const accessToken = localStorage.getItem('access_token')
+
 const cartUrl = "/api/v0/cart/"
-// const cartUrl = "http://127.0.0.1:8000/api/v0/cart/"
+
 export const getCartItems = createAsyncThunk(
     'cart/getCartItems',
     async (name, thunkAPI) =>{
         try{
             
-            
-            const userId = thunkAPI.getState().user.user.id
-            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
-            
-            const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
-            return resp.data
+            // const accessToken = localStorage.getItem('access_token') || null
+            // if(!accessToken){
+            //     //Get Cart Items for anonymous user
+            //     const anonymousUserData = JSON.parse(localStorage.getItem('anonymousUserData'))
+            //     // const selectedWarehouse = anonymousUserData.selectedWarehouse.warehouse
+            //     //If No Existing cart for a warehouse
+                
+
+
+            //     console.log(anonymousUserData)
+            // }else{                                        
+            //     // // const userId = thunkAPI.getState().user.user.id
+            //     // const userId = thunkAPI.getState().user.user_id
+            //     // const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+                
+            //     // const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
+            //     // return resp.data
+            // }
+
+            // const userId = thunkAPI.getState().user.user.id
+                const userId = thunkAPI.getState().user.user_id
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+                
+                const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
+                return resp.data
+
 
         }catch{
             return thunkAPI.rejectWithValue("Not able to fetch cart items")
@@ -40,7 +61,7 @@ export const addCartItem = createAsyncThunk(
     async (warehouseProductId, thunkAPI) =>{
         try{
             
-            const userId = thunkAPI.getState().user.user.id
+            const userId = thunkAPI.getState().user.user_id
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
             const addCartProductUrl = `${cartUrl}add`
 
@@ -72,7 +93,8 @@ export const emptyCart = createAsyncThunk(
     async(name, thunkAPI)=>{
         try{
 
-            const userId = thunkAPI.getState().user.user.id
+            // const userId = thunkAPI.getState().user.user.id
+            const userId = thunkAPI.getState().user.user_id
             const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
             const emptyCartUrl = `${cartUrl}/empty-cart`
             const resp = await axios.post(emptyCartUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId} )
