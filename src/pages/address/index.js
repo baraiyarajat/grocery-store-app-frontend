@@ -10,9 +10,10 @@ import {PencilIcon, TrashIcon} from '@primer/octicons-react'
 import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
-import {getAddresses, deleteAddress} from '../../store/address/addressSlice'
+import {getAddresses, deleteAddress, clearMessages} from '../../store/address/addressSlice'
 import { useState } from 'react';
 import UserBanner from '../includes/UserBanner';
+import { toast } from 'react-toastify';
 
 
 
@@ -86,7 +87,7 @@ function AddressItem({address, showModal,  setShow, setAddressObject}){
 function Address(){
 
     const dispatch = useDispatch()
-    const {addresses, isLoading} = useSelector((store)=>store.address)
+    const {addresses, isLoading, successMessage, errorMessage} = useSelector((store)=>store.address)
     const {user} = useSelector((store)=>store.user)
     const {isAuthenticated} = useSelector((store)=>store.auth)
     const warehouseObject = useSelector((store)=>store.warehouse)
@@ -144,11 +145,20 @@ function Address(){
             dispatch(getAddresses())
             setAddressObject(initialAddressObject)
             setShow(false)
+
+           if(response.data.success_message !==''){
+                toast.success(response.data.success_message)
+            }    
+
+            if(response.data.error_message!==''){
+                toast.error(response.data.error_message)
+            }
+
             
             navigate('/address')
         })
         .catch(error => {
-            setAddressObject(initialAddressObject)
+            setAddressObject(initialAddressObject)            
             setShow(false)
 
         });
@@ -160,6 +170,13 @@ function Address(){
 
             setAddressObject(initialAddressObject)
             setShow(false)
+            if(response.data.success_message !==''){
+                toast.success(response.data.success_message)
+            }    
+
+            if(response.data.error_message!==''){
+                toast.error(response.data.error_message)
+            }
 
             navigate('/address')
         })
@@ -177,6 +194,23 @@ function Address(){
     useEffect(()=>{
         dispatch(getAddresses())
     },[dispatch,user])
+
+
+    useEffect(()=>{
+        if(successMessage!==''){
+            toast.success(successMessage)
+            dispatch(clearMessages())
+        }
+    },[successMessage])
+
+    useEffect(()=>{
+        if(errorMessage!==''){
+            toast.success(errorMessage)
+            dispatch(clearMessages())
+        }
+    },[errorMessage])
+
+
 
     return (
         <>

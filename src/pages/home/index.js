@@ -16,9 +16,12 @@ import { getNewVegetablesAndFruits, getNewWarehouseProducts } from '../../store/
 import { getWishlist } from '../../store/wishlist/wishlistSlice';
 import {addWishlistProduct, deleteWishlistProduct} from '../../store/wishlist/wishlistSlice'
 import { getFeaturedProducts } from '../../store/featuredProducts/featuredProductsSlice';
-import { useState } from 'react';
+
 
 import { addCartItem, deleteCartItem, getCartItems } from '../../store/cart/cartSlice';
+
+
+
 
 
 function CategoryItem(params){
@@ -164,8 +167,8 @@ function _ProductItem({product}){
 
 
 function Home(){
-
-    const {isAuthenticated} = useSelector((store)=>store.auth)
+    
+    const {isAuthenticated, successMessage} = useSelector((store)=>store.auth)
     const {categories, isCategoriesLoading} = useSelector((store)=>store.categories)
     const {warehouse,isLoading} = useSelector((store)=>store.selectedWarehouse)
     const {newProducts, freshVegetablesAndFruits ,isNewProductsLoading, isFreshVegetablesAndFruitsLoading} = useSelector((store)=>store.newProducts)
@@ -204,7 +207,7 @@ function Home(){
 
     
     return(
-        <>
+        <>            
             {/* Navbar */}
             <Navbar/>
             

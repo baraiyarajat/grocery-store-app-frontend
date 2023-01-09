@@ -8,6 +8,7 @@ import { deleteCartItem, emptyCart, getCartItems, setCartTotal, setFinalCartTota
 import { getAddresses } from '../../store/address/addressSlice';
 import { placeOrder } from '../../store/order/orderSlice';
 import { getWalletDetails } from '../../store/wallet/walletSlice';
+import { toast } from 'react-toastify';
 
 
 
@@ -213,7 +214,7 @@ const CardPaymentItem = ({cardDetails, handleCardDetailsChange}) =>{
                         <label className="control-label">CVV*</label>
                         <div className="ui search focus">
                             <div className="ui left icon input swdh11 swdh19">
-                                <input className="prompt srch_explore" name="cvv"  minLength="3" maxLength="3" placeholder="CVV" value={cardDetails.cvv} onChange={handleCardDetailsChange} required={true}/>															
+                                <input className="prompt srch_explore" type="password" name="cvv"  minLength="3" maxLength="3" placeholder="CVV" value={cardDetails.cvv} onChange={handleCardDetailsChange} required={true}/>															
                             </div>
                         </div>
                     </div>
@@ -221,6 +222,21 @@ const CardPaymentItem = ({cardDetails, handleCardDetailsChange}) =>{
             </div>
         </>
     )
+}
+
+function validateCardDetails(cardDetails){
+    
+    const month = parseInt(cardDetails.expr_month)
+    const year = parseInt(cardDetails.expr_year)
+
+    const current_year = new Date().getFullYear()
+    const current_month = new Date().getMonth()
+
+    if(year>=current_year &&  month>=current_month ){
+        return true
+    }
+
+    return false
 }
 
 
@@ -362,25 +378,29 @@ function Checkout(){
         }
 
         
-        
-        if(cartItems.length===0){
-            console.log("Empty Cart")
-        }else if(!selectedAddressId){
-            console.log("Please select an address")
-        }else if (deliveryDateAndTimes[deliveryDates[seletedDeliveryDateIndex]].length ===0){
-            console.log("Please select a valid delivery date and time")
-        }else if(cartTotal<=12){
-            console.log("Cart Total must be greater than 12 dollars")
-        }else{
 
-            
+        if(cartItems.length===0){            
+            toast.error("Please add products to the cart before placing an order!")
+        }else if(!selectedAddressId){            
+            toast.error("Please select an address for the order!")
+        }else if (deliveryDateAndTimes[deliveryDates[seletedDeliveryDateIndex]].length ===0){            
+            toast.error("No delivery time slots available for the selected delivery date. Please change the delivery date.")
+        }else if(cartTotal<=12){            
+            toast.error("Cart Total must be greater than 12 dollars")
+        }else if(paymentMethod === "WALLET" && wallet.credit < cartTotal){
+            toast.error("Your wallet does not have sufficient balance. Please add more credit")
+        }else if (paymentMethod ==="COD" && finalCartTotal > 30){
+            toast.error("For Cash on Delivery payment method, the total amount should not be greater than 30 dollars. ")
+        }
+        else if(paymentMethod==="CARD" && validateCardDetails(cardDetails) !== true){            
+            toast.error("Invalid card details.")
+        }
+        else{            
             if(paymentMethod==='CARD'){
                 orderDetails["card_details"]=cardDetails
             }
-
             dispatch(placeOrder(orderDetails))
-            navigate('/orders')
-
+            navigate('/orders')            
         }
 
          

@@ -8,9 +8,11 @@ const initialwalletState = {
               "cashback_balance":0,
               "formatted_modified_date":null},
     'isWalletLoading':true,
+    'successMessage':'',
+    'errorMessage':''
 }
 
-// const walletUrl = "http://127.0.0.1:8000/api/v0/wallet/"
+
 const walletUrl = "/api/v0/wallet/"
 
 export const getWalletDetails = createAsyncThunk(
@@ -47,24 +49,41 @@ export const addCreditToWallet = createAsyncThunk(
 const walletSlice = createSlice({
     name:'wallet',
     initialState: initialwalletState,
-    reducers:{},
+    reducers:{
+        clearMessages : (state, action) =>{
+            state.successMessage = ''
+            state.errorMessage = ''
+        }
+    },
     extraReducers:(builder)=>{
         builder.addCase(getWalletDetails.pending,(state)=>{
             state.isWalletLoading = true
+            state.errorMessage=''
+            state.successMessage=''
         }).addCase(getWalletDetails.fulfilled,(state,action)=>{
             state.isWalletLoading = false
             state.wallet = action.payload
+            state.errorMessage=''
+            state.successMessage=''
         }).addCase(getWalletDetails.rejected,(state)=>{
             state.isWalletLoading = false
+            state.errorMessage=''
+            state.successMessage=''
         }).addCase(addCreditToWallet.pending,(state)=>{
+            state.errorMessage=''
+            state.successMessage=''
             
-        }).addCase(addCreditToWallet.fulfilled,(state)=>{
+        }).addCase(addCreditToWallet.fulfilled,(state, action)=>{
             state.isWalletLoading = false
-        }).addCase(addCreditToWallet.rejected,(state)=>{
+            state.errorMessage=''
+            state.successMessage=action.payload.success_message
+        }).addCase(addCreditToWallet.rejected,(state, action)=>{
             state.isWalletLoading = false
+            state.successMessage = ''
+            state.errorMessage = action.payload.error_message
         })
     }
 })
 
-
+export const {clearMessages} = walletSlice.actions;
 export default walletSlice.reducer;

@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { authenticateUser, userLogin } from "../../store/auth/authSlice";
+import { authenticateUser, clearMessages, userLogin } from "../../store/auth/authSlice";
 import { useRef } from "react";
 import { useEffect } from "react";
+
+import { toast } from 'react-toastify';
 
 
 function Login(){
@@ -17,22 +19,17 @@ function Login(){
     const navigate = useNavigate();
     const location = useLocation();
     const nextLocation  = searchParams.get('next') || "/"
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || "/";        
     
-    
-    
-    
-
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState("");    
     
-    const [errMsg, setErrMsg] = useState('')
-    
-    const {isAuthenticated} = useSelector((store)=>store.auth)
+    const {isAuthenticated, isAuthenticationLoading, errorMessages, successMessage} = useSelector((store)=>store.auth)
 
 
     const dispatch = useDispatch()
     
+
     const handleLoginSubmit =  (e) =>{
         e.preventDefault();
         
@@ -49,38 +46,50 @@ function Login(){
 
     }
 
-    useEffect(()=>{
-        // console.log(isAuthenticated)
+    useEffect(()=>{     
+        
         if(isAuthenticated){
             if(from!=="/"){
                 navigate(from, {replace:true})
             }else{
                 navigate(nextLocation, {replace:true})
-            }
-            
-        }
-    },[isAuthenticated])
+            }            
+        }        
+
+    },[isAuthenticated , dispatch])
+
+
+    useEffect(()=>{
+        if(successMessage!==''){
+            toast.success(successMessage)            
+        }        
+        dispatch(clearMessages())
+    },[successMessage])
+
+
+    useEffect(()=>{
+        if(errorMessages.length>0){            
+            errorMessages.map((msg)=>{
+                toast.error(msg);                
+            })
+            dispatch(clearMessages())
+        }                
+    },[errorMessages, dispatch])
+
 
     useEffect(()=>{
         userRef.current.focus()
     },[])
 
-    useEffect(()=>{
-        setErrMsg('')
-    },[email, password])
 
     return (
         <>
+            
             <div className="sign-inup">
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-lg-5">
                             <div className="sign-form">
-
-                                <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} 
-                                aria-live="assertive" >{errMsg}</p>
-
-
                                 <div className="sign-inner">
                                     <div className="sign-logo" id="logo">
                                         {/* <Link to="/" ><img src={logo} alt=""/></Link>

@@ -20,6 +20,7 @@ import { getWishlist } from "../../store/wishlist/wishlistSlice";
 import { Modal, Button } from "react-bootstrap";
 import { getCartItems } from "../../store/cart/cartSlice";
 import { getSearchResults, setSearchString } from "../../store/searchResults/searchResultsSlice";
+import { toast } from "react-toastify";
 
 
 function GuestUserItems(){
@@ -76,6 +77,7 @@ function UserAuthenticatedItems({user, isUserLoading, isAuthenticated}){
                         {/* <Dropdown.Item href="/offers" className="btn btn-light item channel_item"><i className="uil uil-gift icon__1"></i>Offers</Dropdown.Item>								
                         <Dropdown.Item href="/faq" className="btn btn-light item channel_item"><i className="uil uil-info-circle icon__1"></i>Faq</Dropdown.Item>								 */}
                         <Dropdown.Item href="/logout"><i className="uil uil-lock-alt icon__1"></i>Logout</Dropdown.Item>
+                        
                     </Dropdown.Menu>
                 </Dropdown>
             </li>
@@ -132,7 +134,7 @@ function Navbar(){
     const selectedWarehouse= useSelector((store)=>store.selectedWarehouse)
     const {warehouses, isLoading} = useSelector((state)=>state.warehouse)
     const {cartItems, isCartLoading} = useSelector((state)=>state.cart)
-    const {isAuthenticated} = useSelector((store)=>store.auth)
+    const {isAuthenticated, successMessage} = useSelector((store)=>store.auth)
     const {user, isUserLoading} = useSelector((store)=>store.user)        
     const {searchString} = useSelector((state)=>state.searchResults)
 
@@ -181,9 +183,6 @@ function Navbar(){
         }
         
     },[selectedWarehouse,dispatch, isAuthenticated, isUserLoading])
-
-
-
 
     return (
         <>

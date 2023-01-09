@@ -2,11 +2,12 @@ import React from 'react';
 
 import {Link, useNavigate} from 'react-router-dom';
 import { useState} from 'react';
-// import axios from 'axios';
 import axios from '../../api/axios';
 
 // import logo from '../../assets/images/logo.svg';
 // import darkLogo from '../../assets/images/dark-logo.svg';
+
+import {toast} from 'react-toastify'
 
 function Register(){
     
@@ -34,27 +35,45 @@ function Register(){
         e.preventDefault();
         
         const registerData = {"first_name":user.firstName,
-                                "last_name":user.lastName,
-                                "email":user.email,
-                                "phone_number":user.phoneNumber,
-                                "password":user.password,
-                                "confirmPassword":user.confirmPassword}
+                              "last_name":user.lastName,
+                              "email":user.email,
+                              "phone_number":user.phoneNumber,
+                              "password":user.password,
+                              "confirmPassword":user.confirmPassword }
 
         
+        if(user.password.length <8){
+            toast.error("Password should have at least 8 characters!")
+        }else if(user.password !== user.confirmPassword){
+            toast.error("Passwords do not match!")
+        }else{
+
+            //Register Account API call
+            axios.post('/accounts/register', registerData)
+            .then((response) => {  
+                //Upon successful registration
+                toast.success("Registration Successful!")          
+                //Redirect to login
+                navigate('/login');
+            })
+            .catch(error => {
+                // console.error('There was an error!', error);
+                //Add error message
+                // console.log(error.response.data['email'])
+                if(error.response.data.email !== null && error.response.data.email[0]==='This field must be unique.' ){
+                    // console.log(error.response.data.email)
+                    toast.error('User with the entered email already exists!')
+                }else{
+                    toast.error('There was some error with registration. Please try again later.')
+                }
 
 
+                
+            });
 
-        //Register Account API call
-        axios.post('/accounts/register', registerData)
-        .then((response) => {
-            //Redirect to login
-            navigate('/login');
-        })
-        .catch(error => {
-            console.error('There was an error!', error);
-            //Add error message
+        }
 
-        });
+        
    
     }
 
@@ -75,7 +94,9 @@ function Register(){
                                 <div className="form-dt">
                                     <div className="form-inpts checout-address-step">
                                         <form onSubmit={handleRegisterFormSubmit}>
-                                            <div className="form-title"><h6>Sign Up</h6></div>
+                                            <div className="form-title">
+                                                <h6>Sign Up</h6>                                                
+                                            </div>
                                             <div className="form-group pos_rel">
                                                 <input id="firstName" name="firstName" type="text" placeholder="First name" value={user.firstName} onChange={handleRegisterFormChange} className="form-control lgn_input" required={true}/>
                                                 <i className="uil uil-user-circle lgn_icon"></i>

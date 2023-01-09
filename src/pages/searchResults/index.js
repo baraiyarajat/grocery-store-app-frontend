@@ -52,7 +52,7 @@ function SearchResultItem(params){
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
-                <Link to={`/products/${params.product.product.slug}`} className="product-img">
+                <Link to={`/products?name=${params.product.product.slug}`} className="product-img">
                     <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         

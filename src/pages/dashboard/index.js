@@ -14,7 +14,7 @@ import UserBanner from '../includes/UserBanner';
 
 function Dashboard(){
 
-
+    console.log("In Dashboard")
     const {wallet, isWalletLoading} = useSelector((store)=>store.wallet)
     const {user} = useSelector((store)=>store.user)
     const dispatch = useDispatch()
@@ -115,7 +115,7 @@ function Dashboard(){
                                                             </li>
                                                         </ul>
                                                     </div>
-                                                    <a href="#" className="more-link14">All Orders <i className="uil uil-angle-double-right"></i></a>
+                                                    <a href="/orders" className="more-link14">All Orders <i className="uil uil-angle-double-right"></i></a>
                                                 </div>
                                             </div>
                                             <div className="col-lg-12 col-md-12">

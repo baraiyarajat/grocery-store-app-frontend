@@ -2,10 +2,12 @@ import axios from "axios";
 import tokenDecode from "jwt-decode";
 
 const PROD_URL = 'https://concise-memory-371719.ew.r.appspot.com'
-// const DEV_URL = 'http://127.0.0.1:8000'
+const DEV_URL = 'http://127.0.0.1:8000'
+
+const CURRENT_URL = DEV_URL
 
 const axios_instance = axios.create({
-    baseURL : PROD_URL,
+    baseURL : CURRENT_URL,
 })
 
 axios_instance.interceptors.request.use(async req => {
@@ -25,7 +27,7 @@ axios_instance.interceptors.request.use(async req => {
             
             const refreshData = {'refresh_token': refreshToken}
             try{
-                const resp = await axios.post(`${PROD_URL}/accounts/refresh`,refreshData )                
+                const resp = await axios.post(`${CURRENT_URL}/accounts/refresh`,refreshData )                
                 localStorage.setItem('access_token',resp.data)
                 req.headers.Authorization = `Bearer ${resp.data}`
             }catch{

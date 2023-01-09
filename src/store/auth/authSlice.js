@@ -6,7 +6,9 @@ import tokenDecode from 'jwt-decode'
 
 const initialAuthState = {
     isAuthenticationLoading : true,
-    isAuthenticated : false
+    isAuthenticated : false,
+    successMessage:'',
+    errorMessages:[],
 
 }
 
@@ -21,21 +23,28 @@ if(accessToken){
 }
 
 
+
+
+
 export const userLogout = createAsyncThunk(
     'auth/userLogout',
     async (name, thunkAPI) =>{
-        try{
-            const loggedInUser = thunkAPI.getState().user.user_id
-            updateUserDataOnLogout(loggedInUser)
-            const logoutDetails = {'refresh_token': localStorage.getItem('refresh_token')}
-            const resp = await axios.post('/accounts/logout',logoutDetails)    
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('access_token');
-            
-            return resp.data
-        }catch{
-            thunkAPI.rejectWithValue("Not able to Logout")
+
+        const accessToken = localStorage.getItem("access_token") || null
+        const refreshToken = localStorage.getItem("refresh_token") || null        
+        if (accessToken!==null || refreshToken !== null){
+            try{
+                const loggedInUser = thunkAPI.getState().user.user_id
+                // updateUserDataOnLogout(loggedInUser)
+                const logoutDetails = {'refresh_token': localStorage.getItem('refresh_token')}
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('access_token');       
+                const resp = await axios.post('/accounts/logout',logoutDetails)                       
+                return resp.data                                
+            }catch{
+                thunkAPI.rejectWithValue("Not able to Logout")
         }
+    }
     }
 )
 
@@ -43,6 +52,7 @@ export const authenticateUser = createAsyncThunk(
     'auth/authenticateUser',
     async (loginDetails,thunkAPI)=>{
           try{
+            
             localStorage.removeItem('access_token')
             localStorage.removeItem('refresh_token')
             const resp = await axios.post('/accounts/login',loginDetails);                    
@@ -70,57 +80,71 @@ const  updateUserDataOnAuthentication = async() =>{
     localStorage.removeItem('anonymousUserData')
 }
 
-const updateUserDataOnLogout = async (loggedInUser)=>{    
-    try{
-        const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
-        const resp = await axios.post(selectedWarehouseUrl, { "user_id":loggedInUser, "selected_warehouse_id":null})        
-        const anonymousUserData = localStorage.getItem('anonymousUserData') || null 
-        if(!anonymousUserData){                
-            localStorage.setItem('anonymousUserData', JSON.stringify({'selectedWarehouse':resp.data}) )        
-        }
-    }catch{
+// const updateUserDataOnLogout = async (loggedInUser)=>{    
+//     try{
+//         const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
+//         const resp = await axios.post(selectedWarehouseUrl, { "user_id":loggedInUser, "selected_warehouse_id":null})        
+//         const anonymousUserData = localStorage.getItem('anonymousUserData') || null 
+//         if(!anonymousUserData){                
+//             localStorage.setItem('anonymousUserData', JSON.stringify({'selectedWarehouse':resp.data}) )        
+//         }
+//     }catch{
         
-    }
+//     }
     
 
 
     
     
-}
+// }
 
 const authSlice = createSlice({
     name:'auth',
     initialState:initialAuthState,
-    reducers:{},
+    reducers:{        
+        clearMessages:(state,action)=>{
+            state.successMessage = ''
+            state.errorMessages = []
+        },        
+    },
     extraReducers:(builder)=>{
         builder.addCase(authenticateUser.pending,(state)=>{       
-            state.isAuthenticationLoading = true
-            // state.accessToken = ""
+            state.isAuthenticationLoading = true            
             state.isAuthenticated = false
-        }).addCase(authenticateUser.fulfilled,(state,action)=>{            
-            state.isAuthenticationLoading = false
-            state.isAuthenticated = true
-            localStorage.setItem('refresh_token', action.payload.refresh_token);
-            localStorage.setItem('access_token', action.payload.access_token);
+        }).addCase(authenticateUser.fulfilled,(state,action)=>{      
+            
+            if(action.payload.error_messages.length > 0){
+                //User unauthenticated
+                state.isAuthenticationLoading = false
+                state.isAuthenticated = false 
+                state.errorMessages = action.payload.error_messages
+                state.successMessage = ''
+            }else{                
+                state.isAuthenticationLoading = false
+                state.isAuthenticated = true
+                state.successMessage = action.payload.success_message
+                state.errorMessages = []
+                localStorage.setItem('refresh_token', action.payload.refresh_token);
+                localStorage.setItem('access_token', action.payload.access_token);
 
-            //Move local storage items for the authenticated user
-            updateUserDataOnAuthentication()
-
+                //Move local storage items for the authenticated user
+                updateUserDataOnAuthentication()
+            }
 
             // state.accessToken = action.payload.access_token
-        }).addCase(authenticateUser.rejected,(state)=>{              
+        }).addCase(authenticateUser.rejected,(state,action)=>{              
             state.isAuthenticationLoading = false
-            state.isAuthenticated = false
-            // state.accessToken = ""
+            state.isAuthenticated = false        
+            state.errorMessages = action.payload.error_messages    
+            state.successMessage = ''
         }).addCase(userLogout.pending,(state)=>{            
-            state.isAuthenticationLoading = true
-            // state.accessToken = ""
+            state.isAuthenticationLoading = true            
             state.isAuthenticated = false
         }).addCase(userLogout.fulfilled,(state,action)=>{            
             state.isAuthenticationLoading = false
-            state.isAuthenticated = false                       
-
-            // state.accessToken = ""
+            state.isAuthenticated = false
+            state.successMessage = "Logout successful!"                                   
+            state.errorMessages = []
         }).addCase(userLogout.rejected,(state)=>{            
             // state.isAuthenticationLoading = false
             // state.isAuthenticated = false
@@ -131,5 +155,6 @@ const authSlice = createSlice({
 
 })
 
+export const {clearMessages} = authSlice.actions
 
 export default authSlice.reducer;

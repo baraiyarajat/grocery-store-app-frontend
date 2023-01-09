@@ -5,7 +5,9 @@ import axios from "../../api/axios";
 
 const initialAddressState = {
     addresses : [],
-    isLoading : true
+    isLoading : true,
+    successMessage : '',
+    errorMessage : ''
 }
 
 
@@ -55,7 +57,11 @@ const addressSlice = createSlice({
     name:'address',
     initialState:initialAddressState,
     reducers:{
+        clearMessages : (state,action) =>{
 
+            state.successMessage = ''
+            state.errorMessage = ''
+        }
     },
     extraReducers:(builder) =>  {
         builder
@@ -68,12 +74,19 @@ const addressSlice = createSlice({
         state.isLoading = false
       } ).addCase(deleteAddress.pending, (state) => {
             state.isLoading = true;
-      }).addCase(deleteAddress.fulfilled, (state) => {
+            state.errorMessage = ''
+            state.successMessage = ''
+      }).addCase(deleteAddress.fulfilled, (state, action) => {
             state.isLoading = false;
-      }).addCase(deleteAddress.rejected, (state) => {
+            state.successMessage = action.payload.success_message
+            state.errorMessage = ''
+      }).addCase(deleteAddress.rejected, (state,action) => {
             state.isLoading = false;
+            state.errorMessage = action.payload.error_message
+            state.successMessage = ''
       })
 }})
 
+export const {clearMessages} = addressSlice.actions;
 
 export default addressSlice.reducer;

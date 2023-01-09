@@ -7,13 +7,33 @@ import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { addCreditToWallet, getWalletDetails } from '../../store/wallet/walletSlice';
+import { addCreditToWallet, clearMessages, getWalletDetails } from '../../store/wallet/walletSlice';
 import { useState } from 'react';
 import UserBanner from '../includes/UserBanner';
+import { toast } from 'react-toastify';
+
+function validateCardDetails(cardDetails){
+    
+    
+
+    const month = parseInt(cardDetails.expr_month)
+    const year = parseInt(cardDetails.expr_year)
+
+    const current_year = new Date().getFullYear()
+    const current_month = new Date().getMonth()
+
+    if(year>=current_year &&  month>=current_month ){
+        return true
+    }
+
+    return false
+}
+
+
 
 function Wallet(){
 
-    const {wallet, isWalletLoading} = useSelector((store)=> store.wallet)
+    const {wallet, isWalletLoading, errorMessage, successMessage} = useSelector((store)=> store.wallet)
 
     const initialCardDetails = {"cardHolderName":"",
                                 "cardNumber":"",
@@ -37,13 +57,22 @@ function Wallet(){
 
     const handleCardFormSubmit = async (e) =>{
         e.preventDefault()
-        
-        await Promise.all([
-            dispatch(addCreditToWallet(cardDetails))
-        ])
 
-        setCardDetails(initialCardDetails)
-        return dispatch(getWalletDetails());
+        if(cardDetails.credit_amount <25){
+            toast.error("Minimum credit amount should be at least 25 dollars")
+        }
+        else if(validateCardDetails(cardDetails)!== true){
+            toast.error("Invalid card details")
+        }else{
+            
+            await Promise.all([
+                dispatch(addCreditToWallet(cardDetails))
+            ])
+
+            setCardDetails(initialCardDetails)
+            return dispatch(getWalletDetails());
+        }
+        
         
     }
 
@@ -52,7 +81,19 @@ function Wallet(){
     },[dispatch])
 
 
-    
+        useEffect(()=>{       
+        if (successMessage!==''){
+            toast.success(successMessage)
+            clearMessages()
+        }
+    }, [successMessage])
+
+    useEffect(()=>{       
+        if (errorMessage!==''){
+            toast.error(errorMessage)
+            clearMessages()
+        }
+    }, [errorMessage ])    
 
     return(
         <>
@@ -236,7 +277,7 @@ function Wallet(){
                                                                     <label className="control-label">CVV*</label>
                                                                     <div className="ui search focus">
                                                                         <div className="ui left icon input swdh11 swdh19">
-                                                                            <input className="prompt srch_explore" name="cvv" value={cardDetails.cvv} onChange={handleCardFormChange} minLength="3" maxLength="3" placeholder="CVV" required/>															
+                                                                            <input className="prompt srch_explore" type="password" name="cvv" value={cardDetails.cvv} onChange={handleCardFormChange} minLength="3" maxLength="3" placeholder="CVV" required/>															
                                                                         </div>
                                                                     </div>
                                                                 </div>

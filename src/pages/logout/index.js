@@ -3,8 +3,7 @@ import { useDispatch } from "react-redux";
 import {useNavigate} from 'react-router-dom';
 import { userLogout } from "../../store/auth/authSlice";
 
-function Logout(){
-    
+function Logout(){    
     const navigate = useNavigate()
     const dispatch = useDispatch()
 

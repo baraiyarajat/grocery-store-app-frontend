@@ -117,12 +117,12 @@ function CartSidebar({showCartModal, setShowCartModal}){
             </Modal.Header>
 
             <Modal.Title>
-                <div class="cart-top-total" id="cart-modal-body-top">
-                    <div class="cart-total-dil">
+                <div className="cart-top-total" id="cart-modal-body-top">
+                    <div className="cart-total-dil">
                         <h4>Gambo Super Market</h4>
                         <span>${cartTotal}</span>
                     </div>
-                    <div class="cart-total-dil pt-2">
+                    <div className="cart-total-dil pt-2">
                         <h4>Delivery Charges</h4>
                         <span>$3</span>
                     </div>
@@ -130,7 +130,7 @@ function CartSidebar({showCartModal, setShowCartModal}){
             </Modal.Title>
 
             <Modal.Body id="cart-modal-body">  
-                <div class="side-cart-items">
+                <div className="side-cart-items">
                     { cartItems.map((item)=>{
                         return <CartItem key={item.id} cartProduct={item} setShowCartModal={setShowCartModal} />
                     })}
@@ -138,18 +138,18 @@ function CartSidebar({showCartModal, setShowCartModal}){
             </Modal.Body>
         
             <Modal.Title id="cart-modal-footer">
-                <div class="cart-total-dil saving-total ">
+                <div className="cart-total-dil saving-total ">
                     <h4>Total Saving</h4>
                     <span>${savings.toFixed(2)}</span>
                 </div>
 
-                <div class="main-total-cart">
+                <div className="main-total-cart">
                     <h2>Total</h2>
                     <span>${finalCartTotal.toFixed(2)}</span>
                 </div>
 
-                <div class="checkout-cart">
-                    <Link to="/" class="promo-code" style={{ 'pointer-events' : 'none'}}>Have a promocode?</Link>
+                <div className="checkout-cart">
+                    <Link to="/" className="promo-code" style={{ 'pointerEvents' : 'none'}}>Have a promocode?</Link>
                     <Button onClick={(e)=>handleCheckout(e)} className="cart-checkout-btn hover-btn btn-secondary" >Proceed to Checkout</Button>
                 </div>
             </Modal.Title>

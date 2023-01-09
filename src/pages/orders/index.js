@@ -6,13 +6,14 @@ import Navbar from '../includes/Navbar';
 import Footer from '../includes/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { getOrders } from '../../store/order/orderSlice';
+import { clearOrderMessages, getOrders } from '../../store/order/orderSlice';
 import UserBanner from '../includes/UserBanner';
+import { toast } from 'react-toastify';
 
 
 function OrderItem({order}){
 
-    console.log(order)
+    
 
     const progressStatuses = (orderStatus) =>{
         const statuses = ['PLACED', 'PACKED', 'ON_THE_WAY', 'DELIVERED']
@@ -127,13 +128,28 @@ function OrderItem({order}){
 
 function Orders(){
 
-    const {orders, isOrdersLoading} = useSelector((state)=>state.order)
-
+    const {orders, isOrdersLoading, successMessage, errorMessage} = useSelector((state)=>state.order)
+    const {isUserLoading} = useSelector((state)=>state.user)
     const dispatch = useDispatch()
 
     useEffect(()=>{
-        dispatch(getOrders())
-    },[])
+        !isUserLoading && dispatch(getOrders())
+    },[isUserLoading])
+
+    useEffect(()=>{       
+        if (successMessage!==''){
+            toast.success(successMessage)
+            dispatch(clearOrderMessages())
+        }
+    }, [successMessage])
+
+    useEffect(()=>{       
+        if (errorMessage!==''){
+            toast.error(errorMessage)
+            dispatch(clearOrderMessages())
+        }
+    }, [errorMessage ])
+
 
     return (
         <>

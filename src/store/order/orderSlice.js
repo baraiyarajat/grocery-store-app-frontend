@@ -4,10 +4,11 @@ import axios from "../../api/axios";
 
 const initialOrdersState = {
     orders: [],
-    isOrdersLoading: true
+    isOrdersLoading: true,
+    successMessage : '',
+    errorMessage: ''
 }
 
-// const ordersUrl = "http://127.0.0.1:8000/api/v0/orders/"
 const ordersUrl = "/api/v0/orders/"
 
 export const getOrders = createAsyncThunk(
@@ -45,25 +46,47 @@ export const placeOrder = createAsyncThunk(
 const orderSlice = createSlice({
     name:"order",
     initialState:initialOrdersState,
-    reducers:{},
+    reducers:{        
+        clearOrderMessages : (state,action) =>{
+            state.errorMessage = ''
+            state.successMessage = ''
+        }   
+    },
     extraReducers:(builder)=>{
         builder.addCase(getOrders.pending,(state)=>{
             state.isOrdersLoading = true
+            state.errorMessage = ''
+            state.successMessage = ''
         }).addCase(getOrders.fulfilled,(state,action)=>{
             state.isOrdersLoading = false
             state.orders = action.payload
+            state.errorMessage = ''
+            state.successMessage = ''
         }).addCase(getOrders.rejected,(state)=>{
             state.isOrdersLoading = false
+            state.errorMessage = ''
+            state.successMessage = ''
         }).addCase(placeOrder.pending,(state)=>{
             state.isOrdersLoading = true
         }).addCase(placeOrder.fulfilled,(state,action)=>{
             state.isOrdersLoading = false
+            if (action.payload.success_message!==''){
+                state.successMessage = action.payload.success_message
+                state.errorMessage = ''
+            } else if (action.payload.error_message!=='') {
+                state.errorMessage = action.payload.error_message
+                state.successMessage = ''
+            }
             
-        }).addCase(placeOrder.rejected,(state)=>{
+        }).addCase(placeOrder.rejected,(state, action)=>{
             state.isOrdersLoading = false
+            state.errorMessage = action.payload.error_message
+            state.successMessage = ''
+            
         })
     }
 })
 
 
+export const {clearOrderMessages} = orderSlice.actions;
 export default orderSlice.reducer;
