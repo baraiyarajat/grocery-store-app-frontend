@@ -1,6 +1,6 @@
 # Grocery Store App
 
-This is a react based grocery store Full Stack project.
+This is a React.js based grocery store Full Stack project. 
 
 
 # Backend
