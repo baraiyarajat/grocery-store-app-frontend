@@ -56,9 +56,9 @@ function NewProductItem(params){
                     <div className="product-absolute-options">
                         
                         { params.product.discount_rate!==0 && <span className="offer-badge-1">{params.product.discount_rate}% off</span>}
-                        {!params.inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                        {params.isAuthenticated && !params.inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
                         
-                        {params.inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
+                        {params.isAuthenticated &&  params.inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
                         
                     </div>
                 </Link>
@@ -155,7 +155,7 @@ function NewProducts(){
 
                                         const inCart = cartProduct && true
 
-                                        return <NewProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist} cartProduct={cartProduct} inCart ={inCart} />})}
+                                        return <NewProductItem key={product.id} product={product}  wishlistProduct={wishlistProduct} inWishlist={inWishlist} cartProduct={cartProduct} inCart ={inCart} isAuthenticated={isAuthenticated} />})}
                                 </div>}
                             </div>
                         </div>

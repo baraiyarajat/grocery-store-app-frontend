@@ -78,14 +78,14 @@ function ProductItem(params){
     return(
         <div className="col-lg-3 col-md-6">
             <div className="product-item mb-30">
-                <Link to={`/products/${params.product.product.slug}`} className="product-img">
+                <Link to={`/products?name=${params.product.product.slug}`} className="product-img">
                     <img src={params.product.product.image} width="200" height="200" alt=""/>
                     <div className="product-absolute-options">
                         
                         { params.product.discount_rate!==0 && <span className="offer-badge-1">{params.product.discount_rate}% off</span>}
-                        {!params.inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                        {params.isAuthenticated &&  !params.inWishlist && <span className="like-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
                         
-                        {params.inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
+                        {params.isAuthenticated &&  params.inWishlist && <span className="like-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}
                         
                     </div>
                 </Link>
@@ -275,7 +275,7 @@ function Home(){
 
                                         const inCart = cartProduct && true
 
-                                        return <ProductItem key={product.id} product={product} wishlistProduct={wishlistProduct} inWishlist={inWishlist} cartProduct={cartProduct} inCart ={inCart}  />})}                                                                            
+                                        return <ProductItem key={product.id} product={product} wishlistProduct={wishlistProduct} inWishlist={inWishlist} cartProduct={cartProduct} inCart ={inCart} isAuthenticated={isAuthenticated} />})}                                                                            
                                 </div>}
                             </div>
                             

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import axios from '../../api/axios'
 import tokenDecode from 'jwt-decode'
+import jwtDecode from "jwt-decode"
 
 
 
@@ -35,7 +36,7 @@ export const userLogout = createAsyncThunk(
         if (accessToken!==null || refreshToken !== null){
             try{
                 const loggedInUser = thunkAPI.getState().user.user_id
-                // updateUserDataOnLogout(loggedInUser)
+                updateUserDataOnLogout(loggedInUser)
                 const logoutDetails = {'refresh_token': localStorage.getItem('refresh_token')}
                 localStorage.removeItem('refresh_token');
                 localStorage.removeItem('access_token');       
@@ -74,29 +75,42 @@ const  updateUserDataOnAuthentication = async() =>{
     const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
     await axios.post(selectedWarehouseUrl, { user_id:"",  "selected_warehouse_id":selectedWarehouse.warehouse.id})
 
-
-
+    // //Add Cart Products for authenticated user
+    const accessToken = localStorage.getItem('access_token')    
+    const userId = jwtDecode(accessToken).user_id
+    const cartUrl = "/api/v0/cart/"
+    const cartItems = JSON.parse(localStorage.getItem('cart_data'))[selectedWarehouse.warehouse.id]
+    console.log(`UserId:${userId}`)
+    console.log(cartItems)
+    if(cartItems.length>0){
+        await axios.post(cartUrl, {'user_id':userId, 'warehouse_id': selectedWarehouse.warehouse.id , 'cart_items':cartItems} )    
+    }        
     //Delete Set Cookie
     localStorage.removeItem('anonymousUserData')
+    localStorage.removeItem('cart_data')
 }
 
-// const updateUserDataOnLogout = async (loggedInUser)=>{    
-//     try{
-//         const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
-//         const resp = await axios.post(selectedWarehouseUrl, { "user_id":loggedInUser, "selected_warehouse_id":null})        
-//         const anonymousUserData = localStorage.getItem('anonymousUserData') || null 
-//         if(!anonymousUserData){                
-//             localStorage.setItem('anonymousUserData', JSON.stringify({'selectedWarehouse':resp.data}) )        
-//         }
-//     }catch{
+const updateUserDataOnLogout = async (loggedInUser)=>{    
+    try{
+        const selectedWarehouseUrl='/api/v0/warehouses/selected-warehouse'
+        const resp = await axios.post(selectedWarehouseUrl, { "user_id":loggedInUser, "selected_warehouse_id":null})        
+        const anonymousUserData = localStorage.getItem('anonymousUserData') || null 
+        if(!anonymousUserData){                
+            localStorage.setItem('anonymousUserData', JSON.stringify({'selectedWarehouse':resp.data}) )        
+        }
+
+        const cartData = localStorage.getItem('cart_data') || null 
         
-//     }
+        if(cartData ===null){
+            const anonymousUserCartData = { 1 : [],
+                                            2 : [],
+                                            3 : []   }
     
-
-
-    
-    
-// }
+            localStorage.setItem('cart_data' , JSON.stringify(anonymousUserCartData))
+        }      
+    }catch{        
+    }        
+}
 
 const authSlice = createSlice({
     name:'auth',

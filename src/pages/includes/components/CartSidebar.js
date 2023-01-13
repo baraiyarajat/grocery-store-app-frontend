@@ -14,8 +14,8 @@ function CartItem({cartProduct, setShowCartModal}){
     const dispatch = useDispatch()
 
     const handleDeleteCartItem = async(e) =>{
-        e.preventDefault()
-        await Promise.all([
+        e.preventDefault()        
+        await Promise.all([            
             dispatch(deleteCartItem(cartProduct.id))
         ]);
         return dispatch(getCartItems());

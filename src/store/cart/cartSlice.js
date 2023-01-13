@@ -14,7 +14,30 @@ const initialCartState = {
     promoCode:{}
 }
 
-const accessToken = localStorage.getItem('access_token')
+
+const userAuthenticated = () =>{    
+    const accessToken = localStorage.getItem('access_token') || null    
+    const refreshToken = localStorage.getItem('refresh_token') || null
+    if (accessToken === null || refreshToken ===null){
+        return false
+    }
+    return true
+}
+
+// Set cart data in localStorage if user not authenticated
+const cartData = localStorage.getItem('cart_data') || null
+if (!userAuthenticated() && !cartData){
+    const anonymousUserCartData = { 1 : [],
+                                    2 : [],
+                                    3 : []   }
+    
+    localStorage.setItem('cart_data' , JSON.stringify(anonymousUserCartData))
+}
+
+
+
+
+
 
 const cartUrl = "/api/v0/cart/"
 
@@ -22,32 +45,24 @@ export const getCartItems = createAsyncThunk(
     'cart/getCartItems',
     async (name, thunkAPI) =>{
         try{
-            
-            // const accessToken = localStorage.getItem('access_token') || null
-            // if(!accessToken){
-            //     //Get Cart Items for anonymous user
-            //     const anonymousUserData = JSON.parse(localStorage.getItem('anonymousUserData'))
-            //     // const selectedWarehouse = anonymousUserData.selectedWarehouse.warehouse
-            //     //If No Existing cart for a warehouse
+ 
+            if(!userAuthenticated()){
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
                 
+                const cartData = JSON.parse(localStorage.getItem('cart_data'))
+                // console.log(cartData)
+                // console.log(cartData[selectedWarehouseId])
+                return cartData[selectedWarehouseId]
 
-
-            //     console.log(anonymousUserData)
-            // }else{                                        
-            //     // // const userId = thunkAPI.getState().user.user.id
-            //     // const userId = thunkAPI.getState().user.user_id
-            //     // const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
-                
-            //     // const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
-            //     // return resp.data
-            // }
-
-            // const userId = thunkAPI.getState().user.user.id
+            }else{
                 const userId = thunkAPI.getState().user.user_id
                 const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
                 
                 const resp = await axios.get(cartUrl, {params :{'user_id':userId, 'selected_warehouse_id':selectedWarehouseId}})
                 return resp.data
+            }
+
+            
 
 
         }catch{
@@ -61,12 +76,27 @@ export const addCartItem = createAsyncThunk(
     async (warehouseProductId, thunkAPI) =>{
         try{
             
-            const userId = thunkAPI.getState().user.user_id
-            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
-            const addCartProductUrl = `${cartUrl}add`
+            if(!userAuthenticated()){   
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id   
+                          
+                const warehouseProductUrl = `api/v0/warehouse_products/id/${warehouseProductId}`
+                const resp = await axios.get(warehouseProductUrl)
+                const cartData = JSON.parse(localStorage.getItem('cart_data'))                
+                
+                const cartSize = cartData[selectedWarehouseId].length
+                const cartItem = { "id":cartSize+1, "warehouse_product" :  resp.data, "quantity":1 }                                
+                cartData[selectedWarehouseId].push(cartItem)
+                localStorage.setItem('cart_data',JSON.stringify(cartData))            
 
-            const resp = await axios.post(addCartProductUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId, 'warehouse_product_id':warehouseProductId} )
-            return resp.data
+            }else{
+                const userId = thunkAPI.getState().user.user_id
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+                const addCartProductUrl = `${cartUrl}add`
+
+                const resp = await axios.post(addCartProductUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId, 'warehouse_product_id':warehouseProductId} )
+                return resp.data
+            }
+           
         }catch{
             return thunkAPI.rejectWithValue("Not able to add product to cart")
         }
@@ -78,9 +108,26 @@ export const deleteCartItem = createAsyncThunk(
     'cart/deleteCartItem',
     async(cartItemId, thunkAPI) =>{
         try{
-            const deleteCartItemUrl = `${cartUrl}delete/${cartItemId}`
-            const resp = await axios.delete(deleteCartItemUrl)
-            return resp.data
+            
+            if(!userAuthenticated()){   
+                
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id                                                             
+                let cartData = JSON.parse(localStorage.getItem('cart_data'))     
+
+                
+                cartData[selectedWarehouseId] = cartData[selectedWarehouseId].filter((item)=>{                                    
+                    return item.id.toString() !==cartItemId.toString()
+                })
+                
+                localStorage.setItem('cart_data', JSON.stringify(cartData))
+                
+
+            }else{
+
+                const deleteCartItemUrl = `${cartUrl}delete/${cartItemId}`
+                const resp = await axios.delete(deleteCartItemUrl)
+                return resp.data
+            }
         }catch{
             return thunkAPI.rejectWithValue("Not able to delete Cart item")
         }
@@ -92,14 +139,21 @@ export const emptyCart = createAsyncThunk(
     'cart/emptyCart',
     async(name, thunkAPI)=>{
         try{
-
-            // const userId = thunkAPI.getState().user.user.id
-            const userId = thunkAPI.getState().user.user_id
-            const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
-            const emptyCartUrl = `${cartUrl}/empty-cart`
-            const resp = await axios.post(emptyCartUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId} )
-            return resp.data
-
+            
+            if(!userAuthenticated()){
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id                                                             
+                let cartData = JSON.parse(localStorage.getItem('cart_data'))                     
+                cartData[selectedWarehouseId] = []                
+                localStorage.setItem('cart_data', JSON.stringify(cartData))
+                
+            }else{
+                // const userId = thunkAPI.getState().user.user.id
+                const userId = thunkAPI.getState().user.user_id
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id
+                const emptyCartUrl = `${cartUrl}/empty-cart`
+                const resp = await axios.post(emptyCartUrl, {'user_id':userId, 'warehouse_id':selectedWarehouseId} )
+                return resp.data
+            }
             
         }catch{
             return thunkAPI.rejectWithValue("Not able to empty the cart")
@@ -112,9 +166,28 @@ export const increaseCartItemQuantity = createAsyncThunk(
     'cart/increaseCartItemQuantity',
     async(cartItemId, thunkAPI) =>{
         try{
-            const increaseCartItemQuantityUrl = `${cartUrl}increase-quantity`
-            const resp = await axios.patch(increaseCartItemQuantityUrl, {"cart_product_id":cartItemId})
-            return resp.data
+
+            if(!userAuthenticated()){   
+                
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id                                                             
+                let cartData = JSON.parse(localStorage.getItem('cart_data'))     
+
+                
+                cartData[selectedWarehouseId] = cartData[selectedWarehouseId].map((item)=>{                                    
+                    if(item.id.toString() ===cartItemId.toString()){
+                        item.quantity+=1
+                    }
+                    return item
+                })
+                
+                localStorage.setItem('cart_data', JSON.stringify(cartData))                
+
+            }else{
+
+                const increaseCartItemQuantityUrl = `${cartUrl}increase-quantity`
+                const resp = await axios.patch(increaseCartItemQuantityUrl, {"cart_product_id":cartItemId})
+                return resp.data
+            }
         }catch{
             return thunkAPI.rejectWithValue("Not able to increase cart item quantity")
         }
@@ -125,9 +198,31 @@ export const decreaseCartItemQuantity = createAsyncThunk(
     'cart/decreaseCartItemQuantity',
     async(cartItemId, thunkAPI) =>{
         try{
-            const increaseCartItemQuantityUrl = `${cartUrl}decrease-quantity`
-            const resp = await axios.patch(increaseCartItemQuantityUrl, {"cart_product_id":cartItemId})
-            return resp.data
+            if(!userAuthenticated()){   
+                
+                const selectedWarehouseId = thunkAPI.getState().selectedWarehouse.warehouse.warehouse.id                                                             
+                let cartData = JSON.parse(localStorage.getItem('cart_data'))     
+
+                
+                cartData[selectedWarehouseId] = cartData[selectedWarehouseId].map((item)=>{                                    
+                    if(item.id.toString() ===cartItemId.toString()){
+                        item.quantity-=1                        
+                    }
+                    return item                    
+                })
+
+                cartData[selectedWarehouseId] = cartData[selectedWarehouseId].filter((item)=>{                                    
+                    return item.quantity>0
+                })
+
+                
+                localStorage.setItem('cart_data', JSON.stringify(cartData))                
+
+            }else{
+                const increaseCartItemQuantityUrl = `${cartUrl}decrease-quantity`
+                const resp = await axios.patch(increaseCartItemQuantityUrl, {"cart_product_id":cartItemId})
+                return resp.data
+            }
         }catch{
             return thunkAPI.rejectWithValue("Not able to decrease cart item quantity")
         }
@@ -160,9 +255,11 @@ const cartSlice = createSlice({
             state.isCartLoading = true 
         }).addCase(deleteCartItem.fulfilled,(state,action)=>{
             
-            state.cartItems = state.cartItems.filter((item)=>{
+            if(userAuthenticated()){
+                state.cartItems = state.cartItems.filter((item)=>{
                 return item.id !== action.payload.cartItemId
-            })
+                })
+            }           
             state.isCartLoading = false
         }).addCase(deleteCartItem.rejected,(state)=>{
             state.isCartLoading = false

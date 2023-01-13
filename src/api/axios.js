@@ -4,7 +4,7 @@ import tokenDecode from "jwt-decode";
 const PROD_URL = 'https://concise-memory-371719.ew.r.appspot.com'
 const DEV_URL = 'http://127.0.0.1:8000'
 
-const CURRENT_URL = DEV_URL
+const CURRENT_URL = PROD_URL
 
 const axios_instance = axios.create({
     baseURL : CURRENT_URL,

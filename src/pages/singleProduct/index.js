@@ -24,7 +24,7 @@ function SingleProduct (){
     const {singleProduct, isSingleProductLoading} = useSelector((store)=>store.singleProduct)
     const {wishlistProducts,isWishlistLoading} = useSelector((store)=>store.wishlist)
     const {cartItems, isCartLoading} = useSelector((store)=>store.cart)
-
+    const {isAuthenticated } = useSelector((store)=>store.auth)
     
 
     const dispatch = useDispatch()
@@ -136,8 +136,8 @@ function SingleProduct (){
                                                         </ul>
                                                         <ul className="gty-wish-share">
                                                             <li>                                                    
-                                                                {!isLoading && !isWishlistLoading &&  !inWishlist && <span className="like-icon save-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
-                                                                {!isLoading && !isWishlistLoading &&   inWishlist && <span className="like-icon save-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}  
+                                                                {isAuthenticated &&  !isLoading && !isWishlistLoading &&  !inWishlist && <span className="like-icon save-icon " title="wishlist" onClick={(e)=>addToWishlistHandler(e)} ></span>}
+                                                                {isAuthenticated && !isLoading && !isWishlistLoading &&   inWishlist && <span className="like-icon save-icon liked" title="wishlist" onClick={(e)=>deleteFromWishlistHandler(e)}></span>}  
                                                             </li>
                                                         </ul>
                                                         <ul className="ordr-crt-share">

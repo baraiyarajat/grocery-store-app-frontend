@@ -55,6 +55,13 @@ function App() {
         <Route path='/register' element={<Register/>} ></Route>
         <Route path='/login' element={<Login/>} ></Route>
         <Route path='/logout' element={<Logout/>} ></Route>
+        
+        <Route path='/' element={<Home/>} ></Route>
+        <Route path='/new-products' element={<NewProducts/>}></Route>
+        <Route path='/featured-products' element={<FeaturedProducts/>}></Route>
+        <Route path='/search-results' element={<SearchResults/>}></Route>        
+        <Route path='/products-by-category' element={<ProductsByCategory />} ></Route>        
+        <Route path='/products' element={<SingleProduct/>}  ></Route>
         {/* <Route path='/logout' element={<Logout/>} ></Route>
         <Route path='/' element={<Home/>} ></Route>
         <Route path='/new-products' element={<NewProducts/>}></Route>
@@ -68,12 +75,12 @@ function App() {
         <Route element={<RequireAuth/>}>
 
           
-          <Route path='/' element={<Home/>} ></Route>
+          {/* <Route path='/' element={<Home/>} ></Route>
           <Route path='/new-products' element={<NewProducts/>}></Route>
           <Route path='/featured-products' element={<FeaturedProducts/>}></Route>
           <Route path='/search-results' element={<SearchResults/>}></Route>        
           <Route path='/products-by-category' element={<ProductsByCategory />} ></Route>        
-          <Route path='/products' element={<SingleProduct/>}  ></Route>
+          <Route path='/products' element={<SingleProduct/>}  ></Route> */}
 
 
           <Route path='/dashboard' element={<Dashboard/>} ></Route>
